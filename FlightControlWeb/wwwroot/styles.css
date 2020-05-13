@@ -1,0 +1,32 @@
+﻿.main-container {
+    /*Main div on center*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    /*Framwork settings*/
+    border: 1px solid darkblue;
+    /*Rounded corners*/
+    border-radius: 20px;
+}
+
+/*The map style-height,rounded corners, space*/
+#map {
+    height: 74%;
+    border-radius: 20px;
+    margin-bottom: 1%;
+}
+
+#flight-details {
+    height: 25%;
+    background-color: rgba(110, 214, 141, 0.726);
+    border-radius: 20px;
+}
+
+#flights {
+    height: 100%;
+    background-color: cornflowerblue;
+    border-radius: 20px;
+}
