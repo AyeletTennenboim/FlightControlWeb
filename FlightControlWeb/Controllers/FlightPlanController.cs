@@ -6,8 +6,6 @@ using FlightControlWeb.FlightObjects;
 using FlightControlWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
@@ -15,7 +13,7 @@ namespace FlightControlWeb.Controllers
     {
         private IFlightsManager flightsManager = new FlightsManager();
 
-        // GET api/FlightPlan/5
+        // GET api/FlightPlan/id
         [HttpGet("{id}")]
         public FlightPlan GetFlightPlanById(string id)
         {

@@ -10,23 +10,28 @@ namespace FlightControlWeb.Models
     {
         private static List<Server> externalServers = new List<Server>();
 
+        // Get a list of external servers from which the server synchronizes information
         public IEnumerable<Server> GetExternalServers()
         {
             return externalServers;
         }
 
+        // Add new server to synchronize flights
         public void AddServer(Server server)
         {
             externalServers.Add(server);
         }
 
+        // Delete server by server ID
         public void DeleteServerById(string id)
         {
             ///////////////////////////////////////// REMOVE !!!          
             externalServers.Add(new Server { ServerId = "1", ServerUrl = "url" });
             externalServers.Add(new Server { ServerId = "2", ServerUrl = "url2" });
-            
+
+            // Get the server with the given ID
             Server server = externalServers.Where(x => x.ServerId == id).FirstOrDefault();
+            // If server doesn't exist
             if (server == null)
             {
                 throw new Exception("Server not found");

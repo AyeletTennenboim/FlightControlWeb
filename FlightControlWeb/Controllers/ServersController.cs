@@ -6,8 +6,6 @@ using FlightControlWeb.FlightObjects;
 using FlightControlWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
@@ -30,7 +28,7 @@ namespace FlightControlWeb.Controllers
             return server;
         }
 
-        // DELETE api/Servers/5
+        // DELETE api/Servers/id
         [HttpDelete("{id}")]
         public void DeleteServerById(string id)
         {

@@ -8,8 +8,8 @@ namespace FlightControlWeb.Models
 {
     interface IFlightsManager
     {
-        IEnumerable<Flight> GetInternalFlights();
-        IEnumerable<Flight> GetAllFlights();
+        IEnumerable<Flight> GetInternalFlights(DateTime time);
+        IEnumerable<Flight> GetAllFlights(DateTime time);
         void AddFlightPlan(FlightPlan plan);
         FlightPlan GetFlightPlanById(string id);
         void DeleteFlightById(string id);

@@ -10,42 +10,75 @@ namespace FlightControlWeb.Models
 {
     public class FlightsManager : IFlightsManager
     {
-        private static ConcurrentDictionary<string, Flight> flights =
-            new ConcurrentDictionary<string, Flight>();
         private static ConcurrentDictionary<string, FlightPlan> flightPlans =
             new ConcurrentDictionary<string, FlightPlan>();
 
-        public IEnumerable<Flight> GetInternalFlights()
+        // Get all active internal flights
+        public IEnumerable<Flight> GetInternalFlights(DateTime time)
+        {
+            string id;
+            Tuple<double, double> location;
+            Flight flight;
+            FlightPlan flightPlan;
+            DateTime startTime, endTime;
+            List<Flight> activeFlights = new List<Flight>();
+
+            // Go over all internal flights
+            foreach (var plan in flightPlans)
+            {
+                id = plan.Key;
+                if (!flightPlans.TryGetValue(id, out flightPlan))
+                {
+                    throw new Exception("Error getting active flights");
+                }
+                // Get the flight start and end time
+                startTime = flightPlan.InitialLocation.DateTime;
+                endTime = flightPlan.InitialLocation.DateTime.
+                    AddSeconds(getFlightDuration(flightPlan));
+                // If flight is active
+                if (DateTime.Compare(startTime, time) <= 0 && DateTime.Compare(time, endTime) <= 0)
+                {
+                    location = getCurrentLocation(flightPlan, time);
+                    // Create flight according to the flight plan
+                    flight = new Flight
+                    {
+                        FlightId = id,
+                        Longitude = location.Item1,
+                        Latitude = location.Item2,
+                        Passengers = flightPlan.Passengers,
+                        CompanyName = flightPlan.CompanyName,
+                        DateTime = flightPlan.InitialLocation.DateTime,
+                        IsExternal = false
+                    };
+                    // Add the flight to the list
+                    activeFlights.Add(flight);
+                }
+            }
+            return activeFlights;
+        }
+
+        // Get all active internal and external flights
+        public IEnumerable<Flight> GetAllFlights(DateTime time)
         {
             List<Flight> flightsList = new List<Flight>();
-            flightsList.AddRange(flights.Values);
+            // Get active internal flights
+            flightsList.AddRange(GetInternalFlights(time));
+
+            /*
+             * Add external flights !
+             */
+
             return flightsList;
         }
 
-        public IEnumerable<Flight> GetAllFlights()
-        {
-            List<Flight> flightsList = new List<Flight>();
-            flightsList.AddRange(flights.Values);
-            return flightsList;
-        }
-
+        // Add flight plan with unique flight ID
         public void AddFlightPlan(FlightPlan plan)
         {
             string id = RandomFlightId();
-            Flight flight = new Flight
-            {
-                FlightId = id,
-                Longitude = plan.InitialLocation.Longitude,
-                Latitude = plan.InitialLocation.Latitude,
-                Passengers = plan.Passengers,
-                CompanyName = plan.CompanyName,
-                DateTime = plan.InitialLocation.DateTime,
-                IsExternal = false
-            };
-            flights.TryAdd(id, flight);
             flightPlans.TryAdd(id, plan);
         }
 
+        // Get flight plan by flight ID
         public FlightPlan GetFlightPlanById(string id)
         {
             FlightPlan plan;
@@ -59,19 +92,12 @@ namespace FlightControlWeb.Models
             }
         }
 
+        // Delete flight plan by flight ID
         public void DeleteFlightById(string id)
         {
-            ///////////////////////////////////////// REMOVE !!!
-            /*
-            flights.TryAdd("1", new Flight { FlightId = "AB1234", Longitude = 33.244, Latitude = 31.12, Passengers = 216, CompanyName = "SwissAir", DateTime = "2020-12-26T23:56:21Z", IsExternal = false });
-            flights.TryAdd("2", new Flight { FlightId = "ZY9876", Longitude = 43.244, Latitude = 41.12, Passengers = 416, CompanyName = "ElAl", DateTime = "2020-05-13T23:56:21Z", IsExternal = true });
-            */
-
-            if (flights.ContainsKey(id))
+            if (flightPlans.ContainsKey(id))
             {
-                Flight removedFlight;
                 FlightPlan removedPlan;
-                flights.TryRemove(id, out removedFlight);
                 flightPlans.TryRemove(id, out removedPlan);
             }
             else
@@ -81,7 +107,7 @@ namespace FlightControlWeb.Models
         }
 
         // Generate a random unique flight ID
-        public string RandomFlightId()
+        private string RandomFlightId()
         {
             StringBuilder builder = new StringBuilder();
             Random random = new Random();
@@ -93,6 +119,53 @@ namespace FlightControlWeb.Models
             }
             builder.Append(random.Next(1000, 9999));
             return builder.ToString();
+        }
+
+        // Calculate flight duration in seconds
+        private double getFlightDuration(FlightPlan plan)
+        {
+            double duration = 0;
+            foreach (Segment segment in plan.Segments)
+            {
+                duration += segment.TimespanSeconds;
+            }
+            return duration;
+        }
+
+        // Calculate the flight location according to the requested time
+        private Tuple<double, double> getCurrentLocation(FlightPlan plan, DateTime currentTime)
+        {
+            int i, numOfSegments = plan.Segments.Length;
+            double longitude = 0, latitude = 0, startLon, startLat, endLon, endLat;
+            DateTime segmentStartTime = plan.InitialLocation.DateTime, segmentEndTime;
+
+            for (i = 0; i <= numOfSegments; i++)
+            {
+                // Calculate segment end time
+                segmentEndTime = segmentStartTime.AddSeconds(plan.Segments[i].TimespanSeconds);
+                // If the flight is in this segement
+                if (DateTime.Compare(segmentStartTime, currentTime) <= 0
+                    && DateTime.Compare(currentTime, segmentEndTime) <= 0)
+                {
+                    // Get the endpoints of the segment
+                    startLon = plan.Segments[i].Longitude;
+                    startLat = plan.Segments[i].Latitude;
+                    endLon = plan.Segments[i + 1].Longitude;
+                    endLat = plan.Segments[i + 1].Latitude;
+
+
+
+
+                    break;
+                }
+                else
+                {
+                    // Set start time for the next segment
+                    segmentStartTime = segmentEndTime;
+                }
+            }
+            // Return current location
+            return new Tuple<double, double>(longitude, latitude);
         }
     }
 }

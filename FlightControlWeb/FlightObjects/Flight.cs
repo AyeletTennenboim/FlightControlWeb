@@ -19,7 +19,7 @@ namespace FlightControlWeb.FlightObjects
         public double Latitude { get; set; }
 
         [JsonPropertyName("passengers")]
-        public long Passengers { get; set; }
+        public int Passengers { get; set; }
 
         [JsonPropertyName("company_name")]
         public string CompanyName { get; set; }
