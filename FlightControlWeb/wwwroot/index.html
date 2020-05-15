@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flight Control Web</title>
+    <!-- Page settings -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Reading Style Files -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <!-- Our style -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Java script -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- Our Java script -->
+    <script src="script.js"></script>
+</head>
+
+<body>
+
+    <!-- The central div will hold all our elements in a beautiful frame in the center of the page -->
+    <div class="main-container container">
+        <!-- This is for the bootstrap grid,we gave it style so that it has height and space between it and the frame -->
+        <div class="row" style="height: 70vh; margin: 10px;">
+            <!-- Insertion of two columns for Grid in size 9 and Grid  in size 3
+                 so they will be in a ratio of 0.75 and 0.25
+                 They will also be 100% of the element they sit inside-->
+            <div class="col-xs-9" style="height: 100%;">
+                <!-- Our map -->
+                <div id="map"></div>
+                <!-- Flight Details -->
+                <div id="flight-details"></div>
+            </div>
+
+            <div class="col-xs-3" style="height: 100%;">
+                <!-- My/external Flights -->
+                <div id="flights"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
