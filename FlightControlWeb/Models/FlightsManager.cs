@@ -2,9 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FlightControlWeb.FlightObjects;
+using Newtonsoft.Json;
 
 namespace FlightControlWeb.Models
 {
@@ -12,6 +15,10 @@ namespace FlightControlWeb.Models
     {
         private static ConcurrentDictionary<string, FlightPlan> flightPlans =
             new ConcurrentDictionary<string, FlightPlan>();
+        private static IServersManager serversManager = new ServersManager();
+        private static readonly HttpClient client = new HttpClient();
+        private static readonly JsonSerializerOptions options =
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 
         // Get all active internal flights
         public IEnumerable<Flight> GetInternalFlights(DateTime time)
@@ -58,16 +65,38 @@ namespace FlightControlWeb.Models
         }
 
         // Get all active internal and external flights
-        public IEnumerable<Flight> GetAllFlights(DateTime time)
+        public async Task<IEnumerable<Flight>> GetAllFlights(DateTime time)
         {
-            List<Flight> flightsList = new List<Flight>();
+            string request;
+            IEnumerable<Server> externalServers = serversManager.GetExternalServers();
+            List<Flight> flightsList = new List<Flight>(), externalFlights = new List<Flight>(),
+                desFlights;
+
             // Get active internal flights
             flightsList.AddRange(GetInternalFlights(time));
-
-            /*
-             * Add external flights !
-             */
-
+            // Get active external flights
+            foreach (Server server in externalServers)
+            {
+                request = server.ServerUrl + "/api/Flights?relative_to="
+                    + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                HttpResponseMessage response = client.GetAsync(request).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    // Get the response
+                    string flightsJsonString = await response.Content.ReadAsStringAsync();
+                    // Deserialize the data
+                    desFlights = System.Text.Json.JsonSerializer.Deserialize<List<Flight>>
+                        (flightsJsonString, options);
+                    // Add the flights received from the server to the list of external flights
+                    externalFlights.AddRange(desFlights);
+                }
+            }
+            // Indicate flights as external and add them to general flights list
+            foreach (Flight flight in externalFlights)
+            {
+                flight.IsExternal = true;
+                flightsList.Add(flight);
+            }
             return flightsList;
         }
 
@@ -79,17 +108,38 @@ namespace FlightControlWeb.Models
         }
 
         // Get flight plan by flight ID
-        public FlightPlan GetFlightPlanById(string id)
+        public async Task<FlightPlan> GetFlightPlanById(string id)
         {
+            string request;
             FlightPlan plan;
+            IEnumerable<Server> externalServers = serversManager.GetExternalServers();
+
+            // If the ID is an internal flight ID
             if (flightPlans.TryGetValue(id, out plan))
             {
                 return plan;
             }
             else
             {
-                throw new Exception("Flight plan not found");
+                // Check if the ID is an external flight ID
+                foreach (Server server in externalServers)
+                {
+                    request = server.ServerUrl + "/api/FlightPlan/" + id;
+                    HttpResponseMessage response = client.GetAsync(request).Result;
+                    // If the ID is an external flight ID
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Get the response
+                        string planJsonString = await response.Content.ReadAsStringAsync();
+                        // Deserialize the data
+                        plan = System.Text.Json.JsonSerializer.Deserialize<FlightPlan>
+                            (planJsonString, options);
+                        return plan;
+                    }
+                }
             }
+            // If the ID does not exist for both internal and external flights - throw exception
+            throw new Exception("Flight plan not found");
         }
 
         // Delete flight plan by flight ID
@@ -136,7 +186,8 @@ namespace FlightControlWeb.Models
         private Tuple<double, double> getCurrentLocation(FlightPlan plan, DateTime currentTime)
         {
             int i, numOfSegments = plan.Segments.Length;
-            double longitude = 0, latitude = 0, startLon, startLat, endLon, endLat;
+            double longitude = 0, latitude = 0, startLon, startLat, endLon, endLat,
+                timeDifference, ratio;
             DateTime segmentStartTime = plan.InitialLocation.DateTime, segmentEndTime;
 
             for (i = 0; i <= numOfSegments; i++)
@@ -147,15 +198,29 @@ namespace FlightControlWeb.Models
                 if (DateTime.Compare(segmentStartTime, currentTime) <= 0
                     && DateTime.Compare(currentTime, segmentEndTime) <= 0)
                 {
+                    // Calculate the time that has passed since the beginning of the segment
+                    timeDifference = currentTime.Subtract(segmentStartTime).TotalSeconds;
+                    // Calculate the ratio of time passed from the beginning of a segment
+                    // to the entire segment time
+                    ratio = timeDifference / plan.Segments[i].TimespanSeconds;
+
                     // Get the endpoints of the segment
-                    startLon = plan.Segments[i].Longitude;
-                    startLat = plan.Segments[i].Latitude;
-                    endLon = plan.Segments[i + 1].Longitude;
-                    endLat = plan.Segments[i + 1].Latitude;
+                    if (i == 0)
+                    {
+                        startLon = plan.InitialLocation.Longitude;
+                        startLat = plan.InitialLocation.Latitude;
+                    }
+                    else
+                    {
+                        startLon = plan.Segments[i - 1].Longitude;
+                        startLat = plan.Segments[i - 1].Latitude;
+                    }
+                    endLon = plan.Segments[i].Longitude;
+                    endLat = plan.Segments[i].Latitude;
 
-
-
-
+                    // Calculate current longitude and latitude
+                    longitude = ((1 - ratio) * startLon) + (ratio * endLon);
+                    latitude = ((1 - ratio) * startLat) + (ratio * endLat);
                     break;
                 }
                 else

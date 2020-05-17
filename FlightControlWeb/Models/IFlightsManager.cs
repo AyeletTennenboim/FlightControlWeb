@@ -9,9 +9,9 @@ namespace FlightControlWeb.Models
     interface IFlightsManager
     {
         IEnumerable<Flight> GetInternalFlights(DateTime time);
-        IEnumerable<Flight> GetAllFlights(DateTime time);
+        Task<IEnumerable<Flight>> GetAllFlights(DateTime time);
         void AddFlightPlan(FlightPlan plan);
-        FlightPlan GetFlightPlanById(string id);
+        Task<FlightPlan> GetFlightPlanById(string id);
         void DeleteFlightById(string id);
     }
 }

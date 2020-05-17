@@ -25,10 +25,6 @@ namespace FlightControlWeb.Models
         // Delete server by server ID
         public void DeleteServerById(string id)
         {
-            ///////////////////////////////////////// REMOVE !!!          
-            externalServers.Add(new Server { ServerId = "1", ServerUrl = "url" });
-            externalServers.Add(new Server { ServerId = "2", ServerUrl = "url2" });
-
             // Get the server with the given ID
             Server server = externalServers.Where(x => x.ServerId == id).FirstOrDefault();
             // If server doesn't exist
