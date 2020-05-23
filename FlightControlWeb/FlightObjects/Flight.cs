@@ -9,6 +9,7 @@ namespace FlightControlWeb.FlightObjects
 {
     public class Flight
     {
+        // Flight properties.
         [JsonPropertyName("flight_id")]
         public string FlightId { get; set; }
 

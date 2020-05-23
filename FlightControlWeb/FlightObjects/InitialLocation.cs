@@ -9,6 +9,7 @@ namespace FlightControlWeb.FlightObjects
 {
     public class InitialLocation
     {
+        // Initial Location properties.
         [JsonPropertyName("longitude")]
         public double Longitude { get; set; }
 
