@@ -15,24 +15,44 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/Servers
         [HttpGet]
-        public IEnumerable<Server> GetExternalServers()
+        public ActionResult<IEnumerable<Server>> GetExternalServers()
         {
-            return serversManager.GetExternalServers();
+            // 200 status code (success) - The resource has been fetched and is transmitted
+            // in the message body.
+            return Ok(serversManager.GetExternalServers());
         }
 
         // POST api/Servers
         [HttpPost]
-        public Server AddServer([FromBody]Server server)
+        public ActionResult<Server> AddServer([FromBody]Server server)
         {
+            // If client input is invalid
+            if (server == null)
+            {
+                // 400 status code (error) - The server cannot process the request.
+                return BadRequest();
+            }
             serversManager.AddServer(server);
-            return server;
+            // 200 status code (success) - The resource describing the result of the action
+            // is transmitted in the message body.
+            return Ok(server);
         }
 
         // DELETE api/Servers/id
         [HttpDelete("{id}")]
-        public void DeleteServerById(string id)
+        public IActionResult DeleteServerById(string id)
         {
-            serversManager.DeleteServerById(id);
+            try
+            {
+                serversManager.DeleteServerById(id);
+                // 204 status code (success) - There is no content to send for this request.
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                // 404 status code (error) - The server can not find the requested resource.
+                return NotFound();
+            }
         }
     }
 }
