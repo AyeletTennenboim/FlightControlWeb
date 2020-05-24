@@ -16,7 +16,8 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/Flights?relative_to=<DATE_TIME>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetAllFlights(DateTime relative_to)
+        public async Task<ActionResult<IEnumerable<Flight>>> GetAllFlights
+            ([FromQuery(Name = "relative_to")] DateTime time)
         {
             IEnumerable<Flight> flights = new List<Flight>();
             string parameters = Request.QueryString.Value;
@@ -25,12 +26,12 @@ namespace FlightControlWeb.Controllers
                 if (parameters.Contains("sync_all"))
                 {
                     // Return all active internal and external flights.
-                    flights = await flightsManager.GetAllFlights(relative_to);
+                    flights = await flightsManager.GetAllFlights(time);
                 }
                 else
                 {
                     // Return all active internal flights.
-                    flights = flightsManager.GetInternalFlights(relative_to);
+                    flights = flightsManager.GetInternalFlights(time);
                 }
                 // 200 status code (success) - The resource has been fetched and is transmitted
                 // in the message body.
