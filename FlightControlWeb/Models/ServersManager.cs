@@ -8,7 +8,13 @@ namespace FlightControlWeb.Models
 {
     public class ServersManager : IServersManager
     {
-        private static List<Server> externalServers = new List<Server>();
+        private IList<Server> externalServers;
+
+        // Constructor.
+        public ServersManager (IList<Server> servers)
+        {
+            externalServers = servers;
+        }
 
         // Get a list of external servers from which the server synchronizes information.
         public IEnumerable<Server> GetExternalServers()

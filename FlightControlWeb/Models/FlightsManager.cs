@@ -13,12 +13,20 @@ namespace FlightControlWeb.Models
 {
     public class FlightsManager : IFlightsManager
     {
-        private static ConcurrentDictionary<string, FlightPlan> flightPlans =
-            new ConcurrentDictionary<string, FlightPlan>();
-        private IServersManager serversManager = new ServersManager();
-        private readonly HttpClient client = new HttpClient();
-        private readonly JsonSerializerOptions options =
-            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+        private IDictionary<string, FlightPlan> flightPlans;
+        private IList<Server> externalServers;
+        private readonly HttpClient client;
+        private readonly JsonSerializerOptions options;
+
+        // Constructor.
+        public FlightsManager (IDictionary<string, FlightPlan> flightPlansDict,
+            IList<Server> servers)
+        {
+            flightPlans = flightPlansDict;
+            externalServers = servers;
+            client = new HttpClient();
+            options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+        }
 
         // Get all active internal flights.
         public IEnumerable<Flight> GetInternalFlights(DateTime time)
@@ -68,7 +76,6 @@ namespace FlightControlWeb.Models
         public async Task<IEnumerable<Flight>> GetAllFlights(DateTime time)
         {
             string request;
-            IEnumerable<Server> externalServers = serversManager.GetExternalServers();
             List<Flight> flightsList = new List<Flight>(), externalFlights = new List<Flight>(),
                 desFlights;
 
@@ -117,7 +124,6 @@ namespace FlightControlWeb.Models
         {
             string request;
             FlightPlan plan;
-            IEnumerable<Server> externalServers = serversManager.GetExternalServers();
 
             // If the ID is an internal flight ID.
             if (flightPlans.TryGetValue(id, out plan))
@@ -152,8 +158,7 @@ namespace FlightControlWeb.Models
         {
             if (flightPlans.ContainsKey(id))
             {
-                FlightPlan removedPlan;
-                if (!flightPlans.TryRemove(id, out removedPlan))
+                if (!flightPlans.Remove(id))
                 {
                     throw new Exception("Error: Flight cannot be removed");
                 }

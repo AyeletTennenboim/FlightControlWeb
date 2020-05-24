@@ -12,7 +12,14 @@ namespace FlightControlWeb.Controllers
     [Route("api/[controller]")]
     public class FlightsController : Controller
     {
-        private IFlightsManager flightsManager = new FlightsManager();
+        private IFlightsManager flightsManager;
+
+        // Constructor uses dependency injection.
+        public FlightsController (IDictionary<string, FlightPlan> flightPlansDict,
+            IList<Server> servers)
+        {
+            flightsManager = new FlightsManager(flightPlansDict, servers);
+        }
 
         // GET: api/Flights?relative_to=<DATE_TIME>
         [HttpGet]

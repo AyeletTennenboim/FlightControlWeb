@@ -11,7 +11,14 @@ namespace FlightControlWeb.Controllers
     [Route("api/[controller]")]
     public class FlightPlanController : Controller
     {
-        private IFlightsManager flightsManager = new FlightsManager();
+        private IFlightsManager flightsManager;
+
+        // Constructor uses dependency injection.
+        public FlightPlanController(IDictionary<string, FlightPlan> flightPlansDict,
+            IList<Server> servers)
+        {
+            flightsManager = new FlightsManager(flightPlansDict, servers);
+        }
 
         // GET api/FlightPlan/id
         [HttpGet("{id}")]
