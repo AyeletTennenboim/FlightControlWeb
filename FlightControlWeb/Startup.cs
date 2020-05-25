@@ -34,6 +34,9 @@ namespace FlightControlWeb
                 ConcurrentDictionary<string, FlightPlan>>();
             // Use a single instance of a servers list throughout the program.
             services.AddSingleton<IList<Server>, List<Server>>();
+            // Use a single instance of a flights and servers dictionary throughout the program.
+            services.AddSingleton<IDictionary<string, Server>,
+                ConcurrentDictionary<string, Server>>();
         }
 
         // This method gets called by the runtime.

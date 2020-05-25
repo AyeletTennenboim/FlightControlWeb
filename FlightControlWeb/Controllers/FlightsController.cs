@@ -16,9 +16,9 @@ namespace FlightControlWeb.Controllers
 
         // Constructor uses dependency injection.
         public FlightsController (IDictionary<string, FlightPlan> flightPlansDict,
-            IList<Server> servers)
+            IList<Server> servers, IDictionary<string, Server> flightsAndServers)
         {
-            flightsManager = new FlightsManager(flightPlansDict, servers);
+            flightsManager = new FlightsManager(flightPlansDict, servers, flightsAndServers);
         }
 
         // GET: api/Flights?relative_to=<DATE_TIME>
@@ -28,6 +28,7 @@ namespace FlightControlWeb.Controllers
         {
             IEnumerable<Flight> flights = new List<Flight>();
             string parameters = Request.QueryString.Value;
+            time = TimeZoneInfo.ConvertTimeToUtc(time);
             try
             {
                 if (parameters.Contains("sync_all"))

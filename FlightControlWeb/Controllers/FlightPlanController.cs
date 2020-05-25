@@ -15,9 +15,9 @@ namespace FlightControlWeb.Controllers
 
         // Constructor uses dependency injection.
         public FlightPlanController(IDictionary<string, FlightPlan> flightPlansDict,
-            IList<Server> servers)
+            IList<Server> servers, IDictionary<string, Server> flightsAndServers)
         {
-            flightsManager = new FlightsManager(flightPlansDict, servers);
+            flightsManager = new FlightsManager(flightPlansDict, servers, flightsAndServers);
         }
 
         // GET api/FlightPlan/id
