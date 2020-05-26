@@ -12,15 +12,19 @@ namespace FlightControlWeb.FlightObjects
     {
         // Flight Plan properties.
         [JsonPropertyName("passengers")]
-        public int Passengers { get; set; }
+        [Range(0, Int32.MaxValue - 1)]
+        public int Passengers { get; set; } = -1;
 
         [JsonPropertyName("company_name")]
+        [Required]
         public string CompanyName { get; set; }
 
         [JsonPropertyName("initial_location")]
+        [Required]
         public InitialLocation InitialLocation { get; set; }
 
         [JsonPropertyName("segments")]
+        [Required]
         public Segment[] Segments { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace FlightControlWeb.FlightObjects
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace FlightControlWeb.FlightObjects
         public double Latitude { get; set; }
 
         [JsonPropertyName("date_time")]
+        [Required]
         public DateTime DateTime { get; set; }
     }
 }

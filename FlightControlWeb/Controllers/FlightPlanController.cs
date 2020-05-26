@@ -43,20 +43,24 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public ActionResult<FlightPlan> AddFlightPlan([FromBody]FlightPlan plan)
         {
-            // If client input is invalid
-            if (plan == null)
+            // If client input is valid.
+            if (ModelState.IsValid)
             {
-                // 400 status code (error) - The server cannot process the request.
-                return BadRequest();
+                try
+                {
+                    string randomId = flightsManager.AddFlightPlan(plan);
+                    // 201 status code (success) - The request has succeeded and a new resource has
+                    // been created as a result (or 400 status code in case of failure).
+                    return CreatedAtAction(nameof(GetFlightPlanById), new { id = randomId }, plan);
+                }
+                catch (Exception)
+                {
+                    // 400 status code (error) - The server cannot process the request.
+                    return BadRequest();
+                }
             }
-            try
-            {
-                string randomId = flightsManager.AddFlightPlan(plan);
-                // 201 status code (success) - The request has succeeded and a new resource has
-                // been created as a result (or 400 status code in case of failure).
-                return CreatedAtAction(nameof(GetFlightPlanById), new { id = randomId }, plan);
-            }
-            catch (Exception)
+            // If client input is invalid.
+            else
             {
                 // 400 status code (error) - The server cannot process the request.
                 return BadRequest();

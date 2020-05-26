@@ -32,16 +32,28 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public ActionResult<Server> AddServer([FromBody]Server server)
         {
-            // If client input is invalid
-            if (server == null)
+            // If client input is valid.
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    serversManager.AddServer(server);
+                    // 200 status code (success) - The resource describing the result of the action
+                    // is transmitted in the message body.
+                    return Ok(server);
+                }
+                catch (Exception)
+                {
+                    // 400 status code (error) - The server cannot process the request.
+                    return BadRequest();
+                }
+            }
+            // If client input is invalid.
+            else
             {
                 // 400 status code (error) - The server cannot process the request.
                 return BadRequest();
             }
-            serversManager.AddServer(server);
-            // 200 status code (success) - The resource describing the result of the action
-            // is transmitted in the message body.
-            return Ok(server);
         }
 
         // DELETE api/Servers/id
