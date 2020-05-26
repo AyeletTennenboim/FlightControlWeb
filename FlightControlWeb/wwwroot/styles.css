@@ -14,25 +14,56 @@
 
 /*The map style-height,rounded corners, space*/
 #map {
-    height: 74%;
-    border-radius: 20px;
+    height: 64%;
     margin-bottom: 1%;
 }
 
-#flight-details {
-    height: 25%;
+#details {
+    height: 35%;
     background-color: rgba(110, 214, 141, 0.726);
-    border-radius: 20px;
 }
 
-#flights {
-    height: 100%;
-    background-color: cornflowerblue;
-    border-radius: 20px;
+#divMyFlights {
+    height: 50%;
+    width: 100%;
+    background-color: rgb(179, 251, 240);
+    font-size: 12px;
 }
 
-@media (min-width: 0px){
+#divExternalflights {
+    height: 50%;
+    width: 100%;
+    background-color: rgb(249, 197, 244);
+}
+
+@media (min-width: 0px) {
     .container{
-        width: 750px;
+        width: 900px;
     }
+}
+
+.table-condensed {
+    font-size: 12px;
+}
+
+#Myflights td {
+    width: auto;
+    height: 12px;
+    font-size: 10px;   
+}
+
+#Externalflights td {
+    width: 50px;
+    height: 12px;
+    font-size: 10px;
+}
+
+#details td {
+    width: 60px;
+    height: auto;
+}
+
+#Myflights button{
+    width:40px;
+    height:20px;
 }
