@@ -26,7 +26,7 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<IEnumerable<Flight>>> GetAllFlights
             ([FromQuery(Name = "relative_to")] DateTime time)
         {
-            IEnumerable<Flight> flights = new List<Flight>();
+            IEnumerable<Flight> flights;
             string parameters = Request.QueryString.Value;
             time = TimeZoneInfo.ConvertTimeToUtc(time);
             try
