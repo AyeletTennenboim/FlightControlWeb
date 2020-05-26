@@ -25,6 +25,14 @@ namespace FlightControlWeb.Models
         // Add new server to synchronize flights.
         public void AddServer(Server server)
         {
+            foreach (Server externalServer in externalServers)
+            {
+                if (server.ServerId == externalServer.ServerId
+                    || server.ServerUrl == externalServer.ServerUrl)
+                {
+                    throw new Exception("Error: Server ID or Url already exists");
+                }
+            }
             externalServers.Add(server);
         }
 

@@ -77,7 +77,6 @@ namespace FlightControlWeb.Models
         // Get all active internal and external flights.
         public async Task<IEnumerable<Flight>> GetAllFlights(DateTime time)
         {
-            string request;
             List<Flight> flightsList = new List<Flight>(), externalFlights;
 
             flightsAndServers.Clear();
@@ -86,31 +85,58 @@ namespace FlightControlWeb.Models
             // Get active external flights.
             foreach (Server server in externalServers)
             {
-                // Send a request to the server to get all its active flights.
-                request = server.ServerUrl + "/api/Flights?relative_to="
-                    + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                HttpResponseMessage response = await client.GetAsync(request);
-                // If the HTTP response is not successful.
-                if (!response.IsSuccessStatusCode)
+                try
                 {
-                    throw new Exception("Error getting active external flights");
+                    externalFlights = await GetFlightsFromExternalServer(time, server);
+                    flightsList.AddRange(externalFlights);
                 }
-                // Get the response.
-                string flightsJsonString = await response.Content.ReadAsStringAsync();
-                // Deserialize the data.
-                externalFlights = System.Text.Json.JsonSerializer.Deserialize<List<Flight>>
-                    (flightsJsonString, options);
-                foreach (Flight flight in externalFlights)
+                catch (Exception)
                 {
-                    // Save the flight ID with the server from which it was received.
-                    flightsAndServers.Add(flight.FlightId, server);
-                    // Indicate flight as external flight.
-                    flight.IsExternal = true;
-                    // Add flight to flights list.
-                    flightsList.Add(flight);
+                    // Ignore external server issues and continue to the next iteration.
+                    continue;
                 }
             }
             return flightsList;
+        }
+
+        // Get external flights from a specific server.
+        private async Task<List<Flight>> GetFlightsFromExternalServer(DateTime time, Server server)
+        {
+            string request, serverUrl;
+            List<Flight> externalFlights;
+
+            // If server Url ends with "/".
+            if (server.ServerUrl.EndsWith("/"))
+            {
+                // Remove the last "/".
+                serverUrl = server.ServerUrl.Remove(server.ServerUrl.Length - 1);
+            }
+            else
+            {
+                serverUrl = server.ServerUrl;
+            }
+            // Send a request to the server to get all its active flights.
+            request = serverUrl + "/api/Flights?relative_to="
+                + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            HttpResponseMessage response = await client.GetAsync(request);
+            // If the HTTP response is not successful.
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Error getting active external flights");
+            }
+            // Get the response.
+            string flightsJsonString = await response.Content.ReadAsStringAsync();
+            // Deserialize the data.
+            externalFlights = System.Text.Json.JsonSerializer.Deserialize<List<Flight>>
+                (flightsJsonString, options);
+            foreach (Flight flight in externalFlights)
+            {
+                // Save the flight ID with the server from which it was received.
+                flightsAndServers.Add(flight.FlightId, server);
+                // Indicate flight as external flight.
+                flight.IsExternal = true;
+            }
+            return externalFlights;
         }
 
         // Add flight plan with unique flight ID.
@@ -128,7 +154,7 @@ namespace FlightControlWeb.Models
         // Get flight plan by flight ID.
         public async Task<FlightPlan> GetFlightPlanById(string id)
         {
-            string request;
+            string request, serverUrl;
             FlightPlan plan;
             Server server;
 
@@ -140,8 +166,18 @@ namespace FlightControlWeb.Models
             // If the ID is an external flight ID.
             else if (flightsAndServers.TryGetValue(id, out server))
             {
+                // If server Url ends with "/".
+                if (server.ServerUrl.EndsWith("/"))
+                {
+                    // Remove the last "/".
+                    serverUrl = server.ServerUrl.Remove(server.ServerUrl.Length - 1);
+                }
+                else
+                {
+                    serverUrl = server.ServerUrl;
+                }
                 // Send a request to the server to get a specific flight.
-                request = server.ServerUrl + "/api/FlightPlan/" + id;
+                request = serverUrl + "/api/FlightPlan/" + id;
                 HttpResponseMessage response = await client.GetAsync(request);
                 // If the HTTP response is successful.
                 if (response.IsSuccessStatusCode)
