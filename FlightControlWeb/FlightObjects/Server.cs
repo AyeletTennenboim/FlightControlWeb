@@ -11,10 +11,12 @@ namespace FlightControlWeb.FlightObjects
     public class Server
     {
         // Server properties.
+        [JsonProperty("ServerId")]
         [JsonPropertyName("ServerId")]
         [Required]
         public string ServerId { get; set; }
 
+        [JsonProperty("ServerURL")]
         [JsonPropertyName("ServerURL")]
         [Required]
         public string ServerUrl { get; set; }
