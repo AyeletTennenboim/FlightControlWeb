@@ -72,6 +72,7 @@ namespace FlightControlWeb.Models
             List<Flight> flightsList = new List<Flight>(), externalFlights = new List<Flight>(),
                 desFlights;
 
+
             // Get active internal flights
             flightsList.AddRange(GetInternalFlights(time));
             // Get active external flights

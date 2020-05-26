@@ -20,18 +20,18 @@ namespace FlightControlWeb.Controllers
         {
             IEnumerable<Flight> flights = new List<Flight>();
             // Convert time to UTC
-            DateTime time = TimeZoneInfo.ConvertTimeToUtc(relative_to);
+            //DateTime time = TimeZoneInfo.ConvertTimeToUtc(relative_to);
             string parameters = Request.QueryString.Value;
 
             if (parameters.Contains("sync_all"))
             {
                 // Return all active internal and external flights
-                flights = await flightsManager.GetAllFlights(time);
+                flights = await flightsManager.GetAllFlights(relative_to);
             }
             else
             {
                 // Return all active internal flights
-                flights = flightsManager.GetInternalFlights(time);
+                flights = flightsManager.GetInternalFlights(relative_to);
             }
             return flights;
         }

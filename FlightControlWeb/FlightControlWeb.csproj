@@ -9,11 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="jquery" Version="3.5.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 
