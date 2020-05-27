@@ -1,8 +1,7 @@
-﻿/*
-All scripts of the index.html, We added JQUERY to it
+﻿/* All scripts of the index.html, We added JQUERY to it
  so that the Java script will only run after the page loads.*/
 
-//Setting the map.
+// Setting the map.
 let map = L.map('map').setView([0, 0], 1);
 L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=LjrLBX4zwd2F8ebL9DTU', {
     attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
@@ -28,18 +27,13 @@ let blueIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-
 let selectedId = -1;
 var latlngs = Array();
 var polyline;
 
-
-
-$(document).ready(function () {
-   
-    //Run loopFunc every half second.
-    setInterval(loopFunc, 1000);  
-    
+$(document).ready(function () {   
+    // Run loopFunc every half second.
+    setInterval(loopFunc, 1000);
 });
 
 function loopFunc() {
@@ -50,8 +44,7 @@ function loopFunc() {
     $.ajax({
         url: flightUrl,
         method: 'GET',
-        success: function (data) {
-            
+        success: function (data) {           
             console.log(data);
             intializeTable();
             data.forEach(function (flight) {
@@ -59,7 +52,6 @@ function loopFunc() {
                     $("#Myflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` + flight.flight_id + "</td>" + "<td onclick = getColumnValue(this)>" + flight.company_name + "</td>" +
                         "<td onclick = getColumnValue(this)>" + flight.is_external + "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
                     markOnMap(flight.longitude, flight.latitude, flight.flight_id);
-
                 } else {
                     $("#Externalflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` + flight.flight_id + "</td>" + "<td onclick=getColumnValue(this)>" + flight.company_name + "</td>" +
                         "<td onclick=getColumnValue(this)>" + flight.is_external + "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
@@ -67,47 +59,64 @@ function loopFunc() {
                 }
                 markRow(selectedId);
             });
-            //remove from details table flights that doesn't exit anymore.
+            // Remove from details table flights that doesn't exit anymore.
             removeFromDetails();
-            //remove markers that the flights doen't exist anymore.
+            // Remove markers that the flights doen't exist anymore.
             removeMarkers();
+        },
+        // Show an error message.
+        error: function (jqXHR) {
+            let message = "Unable to get flights from server";
+            showErrorMessage(jqXHR.status, message);
         }
-    });
-   
+    }); 
 }
-
-
 
 function deleterow1(el) {
     var row = $(el).closest('tr');
     row.remove();
-    //get flight Id
+    // Get flight Id.
     var firstTd = row.find("td:first")[0].innerText;
     var urlDelete = "../api/Flights/" + firstTd;
     console.log(urlDelete);
-    //remove from the server
+    // Remove from the server.
     $.ajax({
         url: urlDelete,
-        method: 'delete'
+        method: 'delete',
+        success: function () {
+            // Delete the previous error message.
+            $('#errorsWindow').text("");
+            deleteRowDetails(firstTd);
+            map.removeLayer(markers[firstTd]);
+            delete markers[firstTd];
+            removePolyline();
+        },
+         // Show an error message.
+        error: function (jqXHR) {
+            let message = "Unable to delete flight";
+            showErrorMessage(jqXHR.status, message);
+        }
     });
+
+    /*
     deleteRowDetails(firstTd);
     map.removeLayer(markers[firstTd]);
     delete markers[firstTd];
     removePolyline();
-
+    */
 }
+
 function getColumnValue(e, flag) {
     let text;
     if (flag == 1) {
-        text = e;
-        
+        text = e;      
     }
     else {
         var row = $(e).closest('tr');
         text = row.find("td:first")[0].innerText;
         for (let key in markers) {
             markers[key].setIcon(blueIcon);
-            //remove icon from flights list///////////////////////////////////////////////////////////
+            // Remove icon from flights list.///////////////////////////////////////////////////////////
         }
         markers[text].setIcon(redIcon);
     }  
@@ -118,6 +127,8 @@ function getColumnValue(e, flag) {
         url: flightplan,
         method: 'GET',
         success: function (flight) {
+            // Delete the previous error message.
+            $('#errorsWindow').text("");
             var len = flight.segments.length;
             let initialTime = flight.initial_location.date_time;
             var mySubString = initialTime.substring(
@@ -129,10 +140,10 @@ function getColumnValue(e, flag) {
                 $("#tbodyDetails").empty();
                 for (let key in markers) {
                     deleteRowDetails(key);
-                    //remove icon from flights list///////////////////////////////////////////////////////////
+                    // Remove icon from flights list.///////////////////////////////////////////////////////////
                 }
                 $("#flight-details").append(`<tr id=${text}><td>` + text + "</td><td> Longitude: " + flight.initial_location.longitude + "<br/>Latitude: " + flight.initial_location.latitude + "</td><td> Longitude: " + flight.segments[len - 1].longitude + "<br/>Latitude: " + flight.segments[len - 1].latitude + "</td><td>" + mySubString + "</td><td>" + flight.company_name + "</td ><td>" + flight.passengers + "</td></tr > ");
-                //add Path Segments
+                // Add Path Segments.
                 latlngs = [];
                 for (let i in flight.segments) {
                     let pointSeg = L.marker([flight.segments[i].latitude, flight.segments[i].longitude]);
@@ -142,19 +153,16 @@ function getColumnValue(e, flag) {
                 removePolyline();
                 //polyline[text] = L.polyline(latlngs, { color: 'red' }).addTo(map);
                 polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
-               
-                
-
-            }
-            
-            
-
-            
+            } 
+        },
+         // Show an error message.
+        error: function (jqXHR) {
+            let message = "Unable to get flight plan details";
+            showErrorMessage(jqXHR.status, message);
         }
     });
 
-
-    //for verification purposes
+    // For verification purposes.
    
 }
 
@@ -164,32 +172,30 @@ function intializeTable() {
     $('#Externalflights tr:gt(0)').remove();
 }
 
-//remove from details
+// Remove from details.
 function deleteRowDetails(flightId) {
     var table = document.getElementById("flight-details");
     if (table.rows[flightId]) {
         var rowIndex = document.getElementById(flightId).rowIndex;
         table.deleteRow(rowIndex);
-
     }
 }
 
-//Remove from details table if flight isn't in tables anymore.
+// Remove from details table if flight isn't in tables anymore.
 function removeFromDetails() {
     var table = document.getElementById("flight-details");
     var tableMyFlight = document.getElementById("Myflights");
     var tableExternalFlight = document.getElementById("Externalflights");
-    //iterate through rows.
+    // Iterate through rows.
     for (var i = 2, row; row = table.rows[i]; i++) {
-        // get flight id of each row.
+        // Get flight id of each row.
         let id = row.cells[0].innerText;
-        // if flight id isn't on one of the tables delete row from details.
+        // If flight id isn't on one of the tables delete row from details.
         if ((!tableMyFlight.rows[id]) && (!tableExternalFlight.rows[id])) {
             deleteRowDetails(id);
             removePolyline();
         }
     }
-    
 }
 
 function removeMarkers() {
@@ -212,7 +218,7 @@ function markOnMap(longitude, latitude, id) {
         marker.on("click", function () {
             for (let key in markers) {
                 markers[key].setIcon(blueIcon);
-                //remove icon from flights list///////////////////////////////////////////////////////////
+                // Remove icon from flights list.///////////////////////////////////////////////////////////
             }
             marker.setIcon(redIcon);
             getColumnValue(id, 1);
@@ -227,7 +233,7 @@ map.on("click", function () {
     for (let key in markers) {
         markers[key].setIcon(blueIcon);
         deleteRowDetails(key);
-        //remove icon from flights list///////////////////////////////////////////////////////////
+        // Remove icon from flights list.///////////////////////////////////////////////////////////
         cleanMarksRows();
         removePolyline();
         selectedId = -1;
@@ -248,15 +254,13 @@ function markRow(id) {
             rows[id].style.backgroundColor = "red";
         }
     }
-   
-
 }
 
-function cleanMarksRows(){
+function cleanMarksRows() {
     var tableMyFlight = document.getElementById("Myflights");
     var tableExternalFlight = document.getElementById("Externalflights");
     var rows = tableMyFlight.getElementsByTagName('tr');
-    //iterate through rows.
+    // Iterate through rows.
     for (var i = 1, row; row = tableMyFlight.rows[i]; i++) {
         row.style.backgroundColor = "";
     }
@@ -266,7 +270,7 @@ function cleanMarksRows(){
     }
 }
 
-function removePolyline(){
+function removePolyline() {
     if (map.hasLayer(polyline)) {
         map.removeLayer(polyline);
         polyline = {};
@@ -286,10 +290,17 @@ $('#add-flight-plan-button').on('click', function (e) {
         data: flightPlan,
         dataType: "json",
         contentType: "application/json",
-        //////////////////////////////////////////////////////////////////// Change
-        success: function () { alert("success"); },
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert(textStatus + ": " + jqXHR.status + " " + errorThrown);
-        }
+        // Delete the previous error message.
+        success: function () { $('#errorsWindow').text("") },
+        // Show an error message.
+        error: function (jqXHR) {
+            let message = "Invalid flight plan file selected. Please check your file and try again";
+            showErrorMessage(jqXHR.status, message);
+        }        
     });
 });
+
+// Show an error message when an action fails.
+function showErrorMessage(errorStatusCode, message) {
+    $('#errorsWindow').text("Error: " + message + "\n" + "(Status Code: " + errorStatusCode + ")");
+}
