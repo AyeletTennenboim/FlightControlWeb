@@ -11,28 +11,66 @@ namespace FlightControlWeb.Controllers
     [Route("api/[controller]")]
     public class ServersController : Controller
     {
-        private IServersManager serversManager = new ServersManager();
+        private IServersManager serversManager;
+
+        // Constructor uses dependency injection.
+        public ServersController (IList<Server> servers)
+        {
+            serversManager = new ServersManager(servers);
+        }
 
         // GET: api/Servers
         [HttpGet]
-        public IEnumerable<Server> GetExternalServers()
+        public ActionResult<IEnumerable<Server>> GetExternalServers()
         {
-            return serversManager.GetExternalServers();
+            // 200 status code (success) - The resource has been fetched and is transmitted
+            // in the message body.
+            return Ok(serversManager.GetExternalServers());
         }
 
         // POST api/Servers
         [HttpPost]
-        public Server AddServer([FromBody]Server server)
+        public ActionResult<Server> AddServer([FromBody]Server server)
         {
-            serversManager.AddServer(server);
-            return server;
+            // If client input is valid.
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    serversManager.AddServer(server);
+                    // 200 status code (success) - The resource describing the result of the action
+                    // is transmitted in the message body.
+                    return Ok(server);
+                }
+                catch (Exception)
+                {
+                    // 400 status code (error) - The server cannot process the request.
+                    return BadRequest();
+                }
+            }
+            // If client input is invalid.
+            else
+            {
+                // 400 status code (error) - The server cannot process the request.
+                return BadRequest();
+            }
         }
 
         // DELETE api/Servers/id
         [HttpDelete("{id}")]
-        public void DeleteServerById(string id)
+        public IActionResult DeleteServerById(string id)
         {
-            serversManager.DeleteServerById(id);
+            try
+            {
+                serversManager.DeleteServerById(id);
+                // 204 status code (success) - There is no content to send for this request.
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                // 404 status code (error) - The server can not find the requested resource.
+                return NotFound();
+            }
         }
     }
 }

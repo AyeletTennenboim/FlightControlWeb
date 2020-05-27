@@ -10,7 +10,7 @@ namespace FlightControlWeb.Models
     {
         IEnumerable<Flight> GetInternalFlights(DateTime time);
         Task<IEnumerable<Flight>> GetAllFlights(DateTime time);
-        void AddFlightPlan(FlightPlan plan);
+        string AddFlightPlan(FlightPlan plan);
         Task<FlightPlan> GetFlightPlanById(string id);
         void DeleteFlightById(string id);
     }

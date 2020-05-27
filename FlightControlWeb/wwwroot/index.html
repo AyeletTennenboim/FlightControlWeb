@@ -29,8 +29,22 @@
             <div class="row" style="height: 70vh; margin: 10px;">
                 <!-- Insertion of two columns for Grid in size 9 and Grid  in size 3
                 so they will be in a ratio of 0.75 and 0.25
-                 They will also be 100% of the element they sit inside-->
+                They will also be 100% of the element they sit inside-->
                 <div class="col-xs-8" style="height: 100%;">
+
+
+
+
+                    <!-- Add flight plan button -->
+                    <div id="flight-plan-button">
+                        <label for="my-flight-plan">Select flight plan file:</label>
+                        <input type="file" id="flight-plan" name="my-flight-plan">
+                        <button id='add-flight-plan-button'>Add flight plan</button>
+                    </div>
+
+
+
+
                     <!-- Our map -->
                     <div id="map"></div>
                     <!-- Flight Details -->
@@ -57,7 +71,7 @@
 
                 <div class="col-xs-4" style="height: 100%;">
                     <!-- My/external Flights -->
-                    <div id="divMyFlights"class="table-responsive">
+                    <div id="divMyFlights" class="table-responsive">
                         <table id="Myflights" class="table table-striped table-hover table-condensed">
                             <thead>
                                 <tr style="font-size: 10px">
@@ -87,16 +101,16 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- Java script -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-        <script src="js/jquery.min.js"></script>
-        <script src="js/popper.min.js"></script>
-        <!-- Our Java script -->
-        <script src="js/script.js"></script>
+    </div>
+    <!-- Java script -->
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+                <script src="js/jquery.min.js"></script>
+                <script src="js/popper.min.js"></script>
+                <!-- Our Java script -->
+                <script src="js/script.js"></script>
 
-    </body>
+</body>
 
 </html>
