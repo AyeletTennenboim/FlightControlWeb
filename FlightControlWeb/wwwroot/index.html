@@ -26,7 +26,7 @@
         <!-- The central div will hold all our elements in a beautiful frame in the center of the page -->
         <div class="main-container container">
             <!-- This is for the bootstrap grid,we gave it style so that it has height and space between it and the frame -->
-            <div class="row" style="height: 70vh; margin: 10px;">
+            <div class="row" style="height: 80vh; margin: 10px;">
                 <!-- Insertion of two columns for Grid in size 9 and Grid  in size 3
                 so they will be in a ratio of 0.75 and 0.25
                 They will also be 100% of the element they sit inside-->
@@ -37,9 +37,14 @@
 
                     <!-- Add flight plan button -->
                     <div id="flight-plan-button">
-                        <label for="my-flight-plan">Select flight plan file:</label>
-                        <input type="file" id="flight-plan" name="my-flight-plan">
-                        <button id='add-flight-plan-button'>Add flight plan</button>
+                        <div id="selectFile">
+                            <label for="my-flight-plan">Select flight plan file:</label>
+                            <input type="file" id="flight-plan" name="my-flight-plan">
+                            <button id='add-flight-plan-button'>Add flight plan</button>
+                        </div>
+                        <div id="errorWindow">
+                            <!-- errors -->
+                        </div>
                     </div>
 
 

@@ -14,13 +14,21 @@
 
 /*The map style-height,rounded corners, space*/
 #map {
-    height: 64%;
+    height: 59%;
     margin-bottom: 1%;
 }
 
 #details {
-    height: 35%;
+    height: 24%;
     background-color: rgba(110, 214, 141, 0.726);
+    margin-bottom: 2%;
+}
+
+#flight-plan-button {
+    height: 15%;
+    background-color: rgba(245, 197, 236, 0.73);
+    font-size: 12px;
+    margin-bottom: 1%;
 }
 
 #divMyFlights {
@@ -34,6 +42,7 @@
     height: 50%;
     width: 100%;
     background-color: rgb(249, 197, 244);
+    margin-bottom: 2%;
 }
 
 @media (min-width: 0px) {
@@ -66,4 +75,17 @@
 #Myflights button{
     width:40px;
     height:20px;
+}
+
+#selectFile {
+    width: 50%;
+    height: 100%;
+    float: left;
+}
+
+#errorWindow {
+    width: 50%;
+    height: 100%;
+    float: right;
+    
 }
