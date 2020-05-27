@@ -19,7 +19,7 @@ $(document).ready(function () {
 });
 
 function loopFunc() {
-    var date = new Date().toISOString().substr(0, 19);
+    var date = new Date().toISOString().substr(0, 19) + "Z";
     console.log(date);
     var flightUrl = "../api/Flights?relative_to=" + date + "&sync_all";
     console.log(flightUrl);
@@ -130,4 +130,23 @@ function markOnMap(longitude, latitude) {
     let marker = L.marker([longitude, latitude]).addTo(layerGroup);
 }
 
+// Post flight plan to the server.
+$('#add-flight-plan-button').on('click', function (e) {
+    let addFlightUrl = "../api/FlightPlan";
+    let flightPlan = document.getElementById('flight-plan').files[0];
 
+    $.ajax({
+        type: 'POST',
+        url: addFlightUrl,
+        processData: false,
+        contentType: false,
+        data: flightPlan,
+        dataType: "json",
+        contentType: "application/json",
+        //////////////////////////////////////////////////////////////////// Change
+        success: function () { alert("success"); },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        }
+    });
+});
