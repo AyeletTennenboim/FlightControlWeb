@@ -302,5 +302,9 @@ $('#add-flight-plan-button').on('click', function (e) {
 
 // Show an error message when an action fails.
 function showErrorMessage(errorStatusCode, message) {
-    $('#errorsWindow').text("Error: " + message + "\n" + "(Status Code: " + errorStatusCode + ")");
+    if (errorStatusCode != 0) {
+        $('#errorsWindow').text("Error: " + message + "\n" + "(Status Code: " + errorStatusCode + ")");
+    } else {
+        $('#errorsWindow').text("Error: Server connection failure.\n Try reconnecting.");
+    }
 }
