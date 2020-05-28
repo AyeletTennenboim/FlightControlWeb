@@ -11,27 +11,22 @@ var layerGroup = L.layerGroup().addTo(map);
 var markers = new Object();
 
 let redIcon = new L.Icon({
-    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    iconUrl: 'images/airplane.png',
+    iconAnchor: [12, 12],
+    popupAnchor: [1, 1]
 });
 
 let blueIcon = new L.Icon({
-    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    iconUrl: 'images/plane.png',
+    iconAnchor: [12, 12],
+    popupAnchor: [1, 1]
 });
 
 
 let selectedId = -1;
 var latlngs = Array();
 var polyline;
+var currentMarkId = -1;
 
 
 
@@ -62,7 +57,7 @@ function loopFunc() {
 
                 } else {
                     $("#Externalflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` + flight.flight_id + "</td>" + "<td onclick=getColumnValue(this)>" + flight.company_name + "</td>" +
-                        "<td onclick=getColumnValue(this)>" + flight.is_external + "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
+                        "<td onclick=getColumnValue(this)>" + flight.is_external + "</td>" + "<td onclick=getColumnValue(this)></td>" + "</tr>");
                     markOnMap(flight.longitude, flight.latitude, flight.flight_id);
                 }
                 markRow(selectedId);
@@ -79,6 +74,7 @@ function loopFunc() {
 
 
 function deleterow1(el) {
+    
     var row = $(el).closest('tr');
     row.remove();
     //get flight Id
@@ -94,9 +90,13 @@ function deleterow1(el) {
     map.removeLayer(markers[firstTd]);
     delete markers[firstTd];
     removePolyline();
+    if (currentMarkId === firstTd) {
+        currentMarkId = -1;
+    }
 
 }
 function getColumnValue(e, flag) {
+    
     let text;
     if (flag == 1) {
         text = e;
@@ -105,13 +105,18 @@ function getColumnValue(e, flag) {
     else {
         var row = $(e).closest('tr');
         text = row.find("td:first")[0].innerText;
-        for (let key in markers) {
+        /*for (let key in markers) {
             markers[key].setIcon(blueIcon);
             //remove icon from flights list///////////////////////////////////////////////////////////
+        }*/
+        if (currentMarkId != -1) {
+            markers[currentMarkId].setIcon(blueIcon);
         }
         markers[text].setIcon(redIcon);
+        currentMarkId = text;
     }  
     selectedId = text;
+    
     console.log(text);
     var flightplan = "../api/FlightPlan/" + text;
     $.ajax({
@@ -119,29 +124,38 @@ function getColumnValue(e, flag) {
         method: 'GET',
         success: function (flight) {
             var len = flight.segments.length;
-            let initialTime = flight.initial_location.date_time;
-            var mySubString = initialTime.substring(
+            let initialTime = new Date(flight.initial_location.date_time).toUTCString();
+            /*var mySubString = initialTime.substring(
                 initialTime.lastIndexOf("T") + 1,
                 initialTime.lastIndexOf("Z")
-            );
+            );*/
+            let addTime = flight.segments.map(segment => segment.timespan_seconds).reduce((a, b) => a + b, 0);
+            let dateFlight = new Date(flight.initial_location.date_time);
+            dateFlight.setSeconds(dateFlight.getSeconds() + addTime);
+            let arrival = dateFlight.toUTCString();
             var table = document.getElementById("flight-details");
+            //If the row isn' already in table add it.
             if (!table.rows[text]) {
                 $("#tbodyDetails").empty();
                 for (let key in markers) {
                     deleteRowDetails(key);
                     //remove icon from flights list///////////////////////////////////////////////////////////
                 }
-                $("#flight-details").append(`<tr id=${text}><td>` + text + "</td><td> Longitude: " + flight.initial_location.longitude + "<br/>Latitude: " + flight.initial_location.latitude + "</td><td> Longitude: " + flight.segments[len - 1].longitude + "<br/>Latitude: " + flight.segments[len - 1].latitude + "</td><td>" + mySubString + "</td><td>" + flight.company_name + "</td ><td>" + flight.passengers + "</td></tr > ");
+                $("#flight-details").append(`<tr id=${text}><td>` + text + "</td><td> Longitude: " + flight.initial_location.longitude + "<br/>Latitude: " + flight.initial_location.latitude + "</td><td> Longitude: " + flight.segments[len - 1].longitude + "<br/>Latitude: " + flight.segments[len - 1].latitude + "</td><td>" + initialTime + "</td><td>" + arrival + "</td><td>" + flight.company_name + "</td ><td>" + flight.passengers + "</td></tr > ");
                 //add Path Segments
                 latlngs = [];
+                /////////////////////////////initial location to path
+                let pointSeg = L.marker([flight.initial_location.latitude, flight.initial_location.longitude]);
+                latlngs.push(pointSeg.getLatLng());
                 for (let i in flight.segments) {
-                    let pointSeg = L.marker([flight.segments[i].latitude, flight.segments[i].longitude]);
+                    pointSeg = L.marker([flight.segments[i].latitude, flight.segments[i].longitude]);
                     latlngs.push(pointSeg.getLatLng());
                 }
                 console.log(latlngs);
                 removePolyline();
                 //polyline[text] = L.polyline(latlngs, { color: 'red' }).addTo(map);
                 polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
+                markRow(selectedId);
                
                 
 
@@ -201,6 +215,9 @@ function removeMarkers() {
             delete markers[key];
         }       
     }
+    if (Object.keys(markers).length === 0) {
+        currentMarkId = -1;
+    }
 }
 
 function markOnMap(longitude, latitude, id) {
@@ -210,14 +227,19 @@ function markOnMap(longitude, latitude, id) {
         let marker = L.marker([latitude, longitude]);
         marker.setIcon(blueIcon);
         marker.on("click", function () {
-            for (let key in markers) {
+            /*for (let key in markers) {
                 markers[key].setIcon(blueIcon);
                 //remove icon from flights list///////////////////////////////////////////////////////////
+            }*/
+            if (currentMarkId != -1) {
+                markers[currentMarkId].setIcon(blueIcon);
             }
             marker.setIcon(redIcon);
+            currentMarkId = id;
             getColumnValue(id, 1);
         });
         markers[id] = marker;
+        
         marker.addTo(layerGroup);
         //layerGroup.clearLayers();
     }  
