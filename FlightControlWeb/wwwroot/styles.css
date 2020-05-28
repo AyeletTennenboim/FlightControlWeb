@@ -24,13 +24,6 @@
     margin-bottom: 2%;
 }
 
-#flight-plan-button {
-    height: 15%;
-    background-color: rgba(245, 197, 236, 0.73);
-    font-size: 12px;
-    margin-bottom: 1%;
-}
-
 #divMyFlights {
     height: 50%;
     width: 100%;
@@ -77,6 +70,13 @@
     height:20px;
 }
 
+#files-and-errors {
+    height: 15%;
+    background-color: rgba(245, 197, 236, 0.73);
+    font-size: 12px;
+    margin-bottom: 1%;
+}
+
 #selectFile {
     width: 50%;
     height: 100%;
@@ -87,5 +87,4 @@
     width: 50%;
     height: 100%;
     float: right;
-    
 }
