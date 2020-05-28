@@ -86,6 +86,9 @@ function deleterow1(el) {
             map.removeLayer(markers[firstTd]);
             delete markers[firstTd];
             removePolyline();
+            if (currentMarkId === firstTd) {
+                currentMarkId = -1;
+            }
         },
          // Show an error message.
         error: function (jqXHR) {
@@ -163,6 +166,7 @@ function getColumnValue(e, flag) {
                 removePolyline();
                 //polyline[text] = L.polyline(latlngs, { color: 'red' }).addTo(map);
                 polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
+                markRow(selectedId);
             } 
         },
          // Show an error message.
