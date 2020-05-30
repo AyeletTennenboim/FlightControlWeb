@@ -236,6 +236,9 @@ function removeFromDetails() {
         if ((!tableMyFlight.rows[id]) && (!tableExternalFlight.rows[id])) {
             deleteRowDetails(id);
             removePolyline();
+            if (selectedId === id) {
+                selectedId = -1;
+            }
         }
     }
 }
@@ -249,6 +252,9 @@ function removeMarkers() {
         if ((!tableMyFlight.rows[key]) && (!tableExternalFlight.rows[key])) {
             map.removeLayer(markers[key]);
             delete markers[key];
+            if (currentMarkId === key) {
+                currentMarkId = -1;
+            }
         }       
     }
     // Update current mark to -1 if there is no more markers on map.
