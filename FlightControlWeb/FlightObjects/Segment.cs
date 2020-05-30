@@ -13,11 +13,13 @@ namespace FlightControlWeb.FlightObjects
         // Segment properties.
         [JsonProperty("longitude")]
         [JsonPropertyName("longitude")]
-        public double Longitude { get; set; }
+        [Range(-180.0, 180.0)]
+        public double Longitude { get; set; } = 200;
 
         [JsonProperty("latitude")]
         [JsonPropertyName("latitude")]
-        public double Latitude { get; set; }
+        [Range(-90.0, 90.0)]
+        public double Latitude { get; set; } = 100;
 
         [JsonProperty("timespan_seconds")]
         [JsonPropertyName("timespan_seconds")]

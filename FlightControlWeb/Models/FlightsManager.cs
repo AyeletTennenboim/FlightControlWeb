@@ -17,7 +17,6 @@ namespace FlightControlWeb.Models
         private IDictionary<string, Server> flightsAndServers;
         private IList<Server> externalServers;
         private readonly HttpClient client;
-        private readonly JsonSerializerOptions options;
 
         // Constructor.
         public FlightsManager (IDictionary<string, FlightPlan> flightPlansDict,
@@ -27,7 +26,6 @@ namespace FlightControlWeb.Models
             flightsAndServers = flightsAndServersDic;
             externalServers = servers;
             client = new HttpClient();
-            options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
         }
 
         // Get all active internal flights.
@@ -127,8 +125,7 @@ namespace FlightControlWeb.Models
             // Get the response.
             string flightsJsonString = await response.Content.ReadAsStringAsync();
             // Deserialize the data.
-            externalFlights = System.Text.Json.JsonSerializer.Deserialize<List<Flight>>
-                (flightsJsonString, options);
+            externalFlights = JsonConvert.DeserializeObject<List<Flight>>(flightsJsonString);
             foreach (Flight flight in externalFlights)
             {
                 // Save the flight ID with the server from which it was received.
@@ -185,8 +182,7 @@ namespace FlightControlWeb.Models
                     // Get the response.
                     string planJsonString = await response.Content.ReadAsStringAsync();
                     // Deserialize the data.
-                    plan = System.Text.Json.JsonSerializer.Deserialize<FlightPlan>
-                        (planJsonString, options);
+                    plan = JsonConvert.DeserializeObject<FlightPlan>(planJsonString);
                     return plan;
                 }
                 else

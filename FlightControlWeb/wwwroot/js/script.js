@@ -46,7 +46,7 @@ function loopFunc() {
                 if (flight.is_external === false) {
                     $("#Myflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` + flight.flight_id + "</td>" + "<td onclick = getColumnValue(this)>" + flight.company_name + "</td>" +
                         "<td onclick = getColumnValue(this)>" + flight.is_external + "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
-                    markOnMap(flight.longitude, flight.latitude, flight.flight_id);
+                markOnMap(flight.longitude, flight.latitude, flight.flight_id);
                 } else {
                     $("#Externalflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` + flight.flight_id + "</td>" + "<td onclick=getColumnValue(this)>" + flight.company_name + "</td>" +
                         "<td onclick=getColumnValue(this)>" + flight.is_external + "</td>" + "<td onclick=getColumnValue(this)></td>" + "</tr>");
