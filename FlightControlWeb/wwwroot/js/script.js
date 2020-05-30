@@ -12,14 +12,14 @@ var markers = new Object();
 // Set new Icon of yellow airplane for click.
 let clickedIcon = new L.Icon({
     iconUrl: 'images/airplane.png',
-    iconAnchor: [12, 12],
+    iconAnchor: [25, 25],
     popupAnchor: [1, 1]
 });
 
 // Set new icon of black airplane when not clicked.
 let blackIcon = new L.Icon({
     iconUrl: 'images/plane.png',
-    iconAnchor: [12, 12],
+    iconAnchor: [25, 25],
     popupAnchor: [1, 1]
 });
 
@@ -236,6 +236,9 @@ function removeFromDetails() {
         if ((!tableMyFlight.rows[id]) && (!tableExternalFlight.rows[id])) {
             deleteRowDetails(id);
             removePolyline();
+            if (selectedId === id) {
+                selectedId = -1;
+            }
         }
     }
 }
@@ -249,6 +252,9 @@ function removeMarkers() {
         if ((!tableMyFlight.rows[key]) && (!tableExternalFlight.rows[key])) {
             map.removeLayer(markers[key]);
             delete markers[key];
+            if (currentMarkId === key) {
+                currentMarkId = -1;
+            }
         }       
     }
     // Update current mark to -1 if there is no more markers on map.
@@ -289,16 +295,19 @@ function markOnMap(longitude, latitude, id) {
 
 // Function click on when click on map.
 map.on("click", function () {
-    // Set current marker on map to black "not selected".
-    markers[currentMarkId].setIcon(blackIcon);
-    // Delete row details.
-    deleteRowDetails(currentMarkId);
-    // Clean mark rows in table.
-    cleanMarksRows();
-    //Remove polyline.
-    removePolyline();
-    // Update that no id was selected.
-    selectedId = -1;
+    if (currentMarkId != -1) {
+        // set current marker on map to black "not selected".
+        markers[currentMarkId].setIcon(blackIcon);
+        // delete row details.
+        deleteRowDetails(currentMarkId);
+        // clean mark rows in table.
+        cleanMarksRows();
+        //remove polyline.
+        removePolyline();
+        // Update that no id was selected.
+        selectedId = -1;
+    }
+    
 });
 
 // This function get flight id and mark row in the suitable table.
