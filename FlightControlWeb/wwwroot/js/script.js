@@ -16,7 +16,7 @@ let clickedIcon = new L.Icon({
     popupAnchor: [1, 1]
 });
 
-//Set new icon of black airplane when not clicked.
+// Set new icon of black airplane when not clicked.
 let blackIcon = new L.Icon({
     iconUrl: 'images/plane.png',
     iconAnchor: [12, 12],
@@ -25,7 +25,7 @@ let blackIcon = new L.Icon({
 
 // Id of flight that was selected, -1 if no flight is selected.
 let selectedId = -1;
-// Array of all segments of flight
+// Array of all segments of flight.
 var latlngs = Array();
 var polyline;
 var currentMarkId = -1;
@@ -109,7 +109,7 @@ function deleterow1(el) {
             if (firstTd === selectedId) {
                 removePolyline();
             }
-            // If the current marked flight is the flight which deleted- flag -1
+            // If the current marked flight is the flight which deleted - flag -1
             // There is no flight that is selected.
             if (currentMarkId === firstTd) {
                 currentMarkId = -1;
@@ -171,7 +171,7 @@ function getColumnValue(e, flag) {
             // Remove GMT from string.
             let arrivalSubString = arrival.substring(0, arrival.indexOf("G"));
             var table = document.getElementById("flight-details");
-            //If the row isn't already in details table add it.
+            // If the row isn't already in details table add it.
             if (!table.rows[text]) {
                 // Remove from details table the previous flight.
                 $("#tbodyDetails").empty();
@@ -287,15 +287,15 @@ function markOnMap(longitude, latitude, id) {
     }  
 }
 
-// function click on when click on map.
+// Function click on when click on map.
 map.on("click", function () {
-    // set current marker on map to black "not selected".
+    // Set current marker on map to black "not selected".
     markers[currentMarkId].setIcon(blackIcon);
-    // delete row details.
+    // Delete row details.
     deleteRowDetails(currentMarkId);
-    // clean mark rows in table.
+    // Clean mark rows in table.
     cleanMarksRows();
-    //remove polyline.
+    //Remove polyline.
     removePolyline();
     // Update that no id was selected.
     selectedId = -1;
@@ -349,7 +349,6 @@ function removePolyline() {
 $('#add-flight-plan-button').on('click', function (e) {
     let addFlightUrl = "../api/FlightPlan";
     let flightPlan = document.getElementById('flight-plan').files[0];
-
     $.ajax({
         type: 'POST',
         url: addFlightUrl,
