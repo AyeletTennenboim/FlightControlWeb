@@ -1,0 +1,90 @@
+﻿.main-container {
+    /*Main div on center*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    /*Framwork settings*/
+    border: 1px solid darkblue;
+    /*Rounded corners*/
+    border-radius: 20px;
+}
+
+/*The map style-height,rounded corners, space*/
+#map {
+    height: 59%;
+    margin-bottom: 1%;
+}
+
+#details {
+    height: 24%;
+    background-color: rgba(110, 214, 141, 0.726);
+    margin-bottom: 2%;
+}
+
+#divMyFlights {
+    height: 50%;
+    width: 100%;
+    background-color: rgb(179, 251, 240);
+    font-size: 12px;
+}
+
+#divExternalflights {
+    height: 50%;
+    width: 100%;
+    background-color: rgb(249, 197, 244);
+    margin-bottom: 2%;
+}
+
+@media (min-width: 0px) {
+    .container{
+        width: 900px;
+    }
+}
+
+.table-condensed {
+    font-size: 12px;
+}
+
+#Myflights td {
+    width: auto;
+    height: 12px;
+    font-size: 10px;   
+}
+
+#Externalflights td {
+    width: 50px;
+    height: 12px;
+    font-size: 10px;
+}
+
+#details td {
+    width: 60px;
+    height: auto;
+}
+
+#Myflights button{
+    width:40px;
+    height:20px;
+}
+
+#files-and-errors {
+    height: 15%;
+    background-color: rgba(245, 197, 236, 0.73);
+    font-size: 12px;
+    margin-bottom: 1%;
+}
+
+#selectFile {
+    width: 50%;
+    height: 100%;
+    float: left;
+}
+
+#errorWindow {
+    width: 50%;
+    height: 100%;
+    float: right;
+}
