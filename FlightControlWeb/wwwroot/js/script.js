@@ -12,14 +12,14 @@ var markers = new Object();
 // Set new Icon of yellow airplane for click.
 let clickedIcon = new L.Icon({
     iconUrl: 'images/airplane.png',
-    iconAnchor: [25, 25],
+    iconAnchor: [12, 12],
     popupAnchor: [1, 1]
 });
 
 // Set new icon of black airplane when not clicked.
 let blackIcon = new L.Icon({
     iconUrl: 'images/plane.png',
-    iconAnchor: [25, 25],
+    iconAnchor: [12, 12],
     popupAnchor: [1, 1]
 });
 
