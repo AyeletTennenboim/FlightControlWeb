@@ -87,8 +87,6 @@ function loopFunc() {
 function deleterow1(el) {
     // Get the row of the td that was clicked.
     var row = $(el).closest('tr');
-    // Remove row.
-    row.remove();
     // Get flight Id.
     var firstTd = row.find("td:first")[0].innerText;
     // Delete request.
@@ -100,6 +98,8 @@ function deleterow1(el) {
         success: function () {
             // Delete the previous error message.
             $('#errorsWindow').text("");
+            // Remove row.
+            row.remove();
             // Delete the flight from Details table if exist.
             deleteRowDetails(firstTd);
             // Remove mark of this flight from map.
