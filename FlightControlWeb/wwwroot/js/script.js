@@ -138,7 +138,7 @@ function getColumnValue(e, flag) {
         var row = $(e).closest('tr');
         // Get flight id from table.
         text = row.find("td:first")[0].innerText;
-        // If there is flight that already selected-set it's icon to black("not selected" anymore).
+        // If there is flight that already selected-set it's icon to black ("not selected" anymore).
         if (currentMarkId != -1) {
             markers[currentMarkId].setIcon(blackIcon);
         }

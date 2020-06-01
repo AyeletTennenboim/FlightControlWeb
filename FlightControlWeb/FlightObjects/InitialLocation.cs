@@ -23,6 +23,7 @@ namespace FlightControlWeb.FlightObjects
 
         [JsonProperty("date_time")]
         [JsonPropertyName("date_time")]
+        [Range(typeof(DateTime), "0001-01-01T00:00:00Z", "9999-12-31T11:59:59Z")]
         public DateTime DateTime { get; set; }
     }
 }
