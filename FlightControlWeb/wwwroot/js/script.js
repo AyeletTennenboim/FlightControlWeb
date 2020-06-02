@@ -104,22 +104,20 @@ function deleterow1(el) {
             // Delete the previous error message.
             $('#errorsWindow').text("");
             // Remove row.
-            row.remove();
-            // Delete the flight from Details table if exist.
-            deleteRowDetails(firstTd);
-            // Remove mark of this flight from map.
-            map.removeLayer(markers[firstTd]);
-            delete markers[firstTd];
-            // Delete polyline only if the deleted row is selected.
+            row.remove();        
             if (firstTd === currentMarkId) {
+                // Delete polyline only if the deleted row is selected.
                 removePolyline();
-            }
-            // If the current marked flight is the flight which deleted - flag -1
-            // There is no flight that is selected.
-            if (currentMarkId === firstTd) {
+                // Delete the flight from Details table if exist.
+                deleteRowDetails(firstTd);
+                // Remove mark of this flight from map.
+                map.removeLayer(markers[firstTd]);
+                //delete markers[firstTd];
+                // If the current marked flight is the flight which deleted - flag -1
+                // There is no flight that is selected.
                 currentMarkId = -1;
-                //selectedId = -1;
             }
+            
         },
          // Show an error message.
         error: function (jqXHR) {
@@ -235,6 +233,7 @@ function deleteRowDetails(flightId) {
     if (table.rows[flightId]) {
         let rowIndex = document.getElementById(flightId).rowIndex;
         table.deleteRow(rowIndex);
+        
     }
 }
 
