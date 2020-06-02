@@ -16,7 +16,6 @@ namespace FlightControlWeb.Models
         private IDictionary<string, FlightPlan> flightPlans;
         private IDictionary<string, Server> flightsAndServers;
         private IList<Server> externalServers;
-        private readonly HttpClient client;
 
         // Constructor.
         public FlightsManager (IDictionary<string, FlightPlan> flightPlansDict,
@@ -25,7 +24,6 @@ namespace FlightControlWeb.Models
             flightPlans = flightPlansDict;
             flightsAndServers = flightsAndServersDic;
             externalServers = servers;
-            client = new HttpClient();
         }
 
         // Get all active internal flights.
@@ -75,23 +73,25 @@ namespace FlightControlWeb.Models
         // Get all active internal and external flights.
         public async Task<IEnumerable<Flight>> GetAllFlights(DateTime time)
         {
-            List<Flight> flightsList = new List<Flight>(), externalFlights;
+            List<Flight> flightsList = new List<Flight>(), externalFlights = new List<Flight>();
 
             // Get active internal flights.
             flightsList.AddRange(GetInternalFlights(time));
             // Get active external flights.
             foreach (Server server in externalServers)
             {
+                string ser = server.ServerUrl;
                 try
                 {
-                    externalFlights = await GetFlightsFromExternalServer(time, server);
-                    flightsList.AddRange(externalFlights);
+                    //externalFlights.AddRange(await GetFlightsFromExternalServer(time, server));
+                    flightsList.AddRange(await GetFlightsFromExternalServer(time, server));
                 }
                 catch (Exception)
                 {
                     // Ignore external server issues and continue to the next iteration.
-                    continue;
+                    //continue;
                 }
+                ser = server.ServerUrl;
             }
             return flightsList;
         }
@@ -100,7 +100,7 @@ namespace FlightControlWeb.Models
         private async Task<List<Flight>> GetFlightsFromExternalServer(DateTime time, Server server)
         {
             string request, serverUrl;
-            List<Flight> externalFlights = null;
+            List<Flight> externalFlights = new List<Flight>();
 
             // If server Url ends with "/".
             if (server.ServerUrl.EndsWith("/"))
@@ -126,12 +126,12 @@ namespace FlightControlWeb.Models
                 // Get the response.
                 string flightsJsonString = await response.Content.ReadAsStringAsync();
                 // Deserialize the data.
-                externalFlights = JsonConvert.DeserializeObject<List<Flight>>(flightsJsonString);
-                flightsAndServers.Clear();
+                externalFlights.AddRange(JsonConvert.DeserializeObject<List<Flight>>(flightsJsonString));
+                //flightsAndServers.Clear();
                 foreach (Flight flight in externalFlights)
                 {
                     // Save the flight ID with the server from which it was received.
-                    flightsAndServers.Add(flight.FlightId, server);
+                    flightsAndServers.TryAdd(flight.FlightId, server);
                     // Indicate flight as external flight.
                     flight.IsExternal = true;
                 }
