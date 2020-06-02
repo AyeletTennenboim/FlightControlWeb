@@ -104,7 +104,8 @@ function deleterow1(el) {
             // Delete the previous error message.
             $('#errorsWindow').text("");
             // Remove row.
-            row.remove();        
+            row.remove();
+            
             if (firstTd === currentMarkId) {
                 // Delete polyline only if the deleted row is selected.
                 removePolyline();
@@ -112,6 +113,7 @@ function deleterow1(el) {
                 deleteRowDetails(firstTd);
                 // Remove mark of this flight from map.
                 map.removeLayer(markers[firstTd]);
+                delete markers[firstTd];
                 //delete markers[firstTd];
                 // If the current marked flight is the flight which deleted - flag -1
                 // There is no flight that is selected.
