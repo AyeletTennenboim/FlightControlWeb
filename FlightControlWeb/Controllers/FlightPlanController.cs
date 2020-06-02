@@ -41,7 +41,7 @@ namespace FlightControlWeb.Controllers
 
         // POST api/FlightPlan
         [HttpPost]
-        public ActionResult<FlightPlan> AddFlightPlan([FromBody]FlightPlan plan)
+        public ActionResult AddFlightPlan([FromBody]FlightPlan plan)
         {
             // If client input is valid.
             if (ModelState.IsValid)
