@@ -16,14 +16,17 @@ namespace FlightControlWeb.Models
         private IDictionary<string, FlightPlan> flightPlans;
         private IDictionary<string, Server> flightsAndServers;
         private IList<Server> externalServers;
+        private HttpClient client;
 
         // Constructor.
         public FlightsManager (IDictionary<string, FlightPlan> flightPlansDict,
-            IList<Server> servers, IDictionary<string, Server> flightsAndServersDic)
+            IList<Server> servers, IDictionary<string, Server> flightsAndServersDic,
+            HttpClient httpClient)
         {
             flightPlans = flightPlansDict;
             flightsAndServers = flightsAndServersDic;
             externalServers = servers;
+            client = httpClient;
         }
 
         // Get all active internal flights.
@@ -82,7 +85,6 @@ namespace FlightControlWeb.Models
             {
                 try
                 {
-                    //externalFlights.AddRange(await GetFlightsFromExternalServer(time, server));
                     flightsList.AddRange(await GetFlightsFromExternalServer(time, server));
                 }
                 catch (Exception)
@@ -112,7 +114,8 @@ namespace FlightControlWeb.Models
             // Send a request to the server to get all its active flights.
             request = serverUrl + "/api/Flights?relative_to="
                 + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            using (HttpClient client = new HttpClient())
+            using (client)
+            //using (HttpClient client = new HttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync(request);
                 // If the HTTP response is not successful.
@@ -175,7 +178,8 @@ namespace FlightControlWeb.Models
                 }
                 // Send a request to the server to get a specific flight.
                 request = serverUrl + "/api/FlightPlan/" + id;
-                using (HttpClient client = new HttpClient())
+                using (client)
+                //using (HttpClient client = new HttpClient())
                 {
                     HttpResponseMessage response = await client.GetAsync(request);
                     // If the HTTP response is successful.

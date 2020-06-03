@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FlightControlWeb.FlightObjects;
 using FlightControlWeb.Models;
@@ -16,9 +17,11 @@ namespace FlightControlWeb.Controllers
 
         // Constructor uses dependency injection.
         public FlightsController (IDictionary<string, FlightPlan> flightPlansDict,
-            IList<Server> servers, IDictionary<string, Server> flightsAndServers)
+            IList<Server> servers, IDictionary<string, Server> flightsAndServers,
+            HttpClient httpClient)
         {
-            flightsManager = new FlightsManager(flightPlansDict, servers, flightsAndServers);
+            flightsManager = new FlightsManager(flightPlansDict, servers, flightsAndServers,
+                httpClient);
         }
 
         // GET: api/Flights?relative_to=<DATE_TIME>
