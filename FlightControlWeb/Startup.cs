@@ -56,8 +56,6 @@ namespace FlightControlWeb
 
             app.UseStaticFiles();
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
