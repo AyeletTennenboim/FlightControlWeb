@@ -103,10 +103,10 @@ function deleterow1(el) {
             map.removeLayer(markers[firstTd]);
             delete markers[firstTd];
             if (firstTd === currentMarkId) {
-                // Delete the flight from Details table if exist.
-                deleteRowDetails(firstTd);                
                 // Delete polyline only if the deleted row is selected.
                 removePolyline();
+                // Delete the flight from Details table if exist.
+                deleteRowDetails(firstTd);
                 // If the current marked flight is the flight which deleted - flag -1
                 // There is no flight that is selected.
                 currentMarkId = -1;
@@ -136,10 +136,10 @@ function getColumnValue(e, flag) {
         let row = $(e).closest('tr');
         // Get flight id from table.
         text = row.find("td:first")[0].innerText;      
-    }
-    if (text != currentMarkId) {
-        // Get flight plan if this current flight that was selected.
-        let flightplan = "/api/FlightPlan/" + text;
+    }   
+    // Get flight plan if this current flight that was selected.
+    let flightplan = "/api/FlightPlan/" + text;
+    if (currentMarkId != text) {
         $.ajax({
             url: flightplan,
             method: 'GET',
@@ -149,9 +149,7 @@ function getColumnValue(e, flag) {
                 // Clean row that is marked before.
                 cleanMarksRows();
                 // Remove previous polyline.
-                if (currentMarkId != text) {
-                    removePolyline();
-                }
+                removePolyline();
                 // Return the black icon to the previous mark.
                 if (currentMarkId != -1) {
                     markers[currentMarkId].setIcon(blackIcon);
@@ -206,7 +204,7 @@ function getColumnValue(e, flag) {
             }
         });  
     }
-       
+    
 }
 
 // Remove all data in flights tables exept the first row of the head.
