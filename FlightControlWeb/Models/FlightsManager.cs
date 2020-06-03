@@ -114,8 +114,7 @@ namespace FlightControlWeb.Models
             // Send a request to the server to get all its active flights.
             request = serverUrl + "/api/Flights?relative_to="
                 + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            using (client)
-            //using (HttpClient client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync(request);
                 // If the HTTP response is not successful.
@@ -179,7 +178,6 @@ namespace FlightControlWeb.Models
                 // Send a request to the server to get a specific flight.
                 request = serverUrl + "/api/FlightPlan/" + id;
                 using (client)
-                //using (HttpClient client = new HttpClient())
                 {
                     HttpResponseMessage response = await client.GetAsync(request);
                     // If the HTTP response is successful.
