@@ -148,8 +148,6 @@ function getColumnValue(e, flag) {
                 markRow(text);
                 // Clean row that is marked before.
                 cleanMarksRows();
-                // Remove previous polyline.
-                removePolyline();
                 // Return the black icon to the previous mark.
                 if (currentMarkId != -1) {
                     markers[currentMarkId].setIcon(blackIcon);
@@ -192,6 +190,8 @@ function getColumnValue(e, flag) {
                         pointSeg = L.marker([flight.segments[i].latitude, flight.segments[i].longitude]);
                         latlngs.push(pointSeg.getLatLng());
                     }
+                    // Remove previous polyline.
+                    removePolyline();
                     // Add current polyline.
                     polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
 
