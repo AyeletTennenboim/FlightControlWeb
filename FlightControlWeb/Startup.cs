@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FlightControlWeb.FlightObjects;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,8 @@ namespace FlightControlWeb
             // Use a single instance of a flights and servers dictionary throughout the program.
             services.AddSingleton<IDictionary<string, Server>,
                 ConcurrentDictionary<string, Server>>();
+            // HttpClient dependency injection.
+            services.AddTransient<HttpClient>();
         }
 
         // This method gets called by the runtime.
