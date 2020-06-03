@@ -34,7 +34,7 @@ let currentMarkId = -1;
 // Java script will only run after the page loads.
 $(document).ready(function () {   
     // Run loopFunc each second.
-    setInterval(loopFunc, 3000);
+    setInterval(loopFunc, 2000);
 });
 
 function loopFunc() {
@@ -47,33 +47,43 @@ function loopFunc() {
         url: flightUrl,
         method: 'GET',
         success: function (data) {
-            // Initialize the table before add the current flights.
-            intializeTable();           
+            // Check if we got a diffrent data.
+            let changed = isChanged(data);
+            // If data is changed- update tables.
+            if (changed === 1) {
+                // Initialize the table before add the current flights.
+                intializeTable();
+                contentMyFlights = $("#Myflights").html();
+                contentExternal = $("#Externalflights").html();
+                data.forEach(function (flight) {
+                    // If the flight isn't external appand to "my flights" table.
+                    if (flight.is_external === false) {
+                        $("#Myflights").append(`<tr id=${flight.flight_id}>` +
+                            "<td onclick = getColumnValue(this,0)>" +
+                            flight.flight_id + "</td>" + "<td onclick = getColumnValue(this,0)>" +
+                            flight.company_name + "</td>" + "<td onclick = getColumnValue(this,0)>" +
+                            flight.is_external + "</td>" + "<td><button style='font-size:10px'" +
+                            " onclick = deleterow1(this)>delete</button></td>" + "</tr>");
+                    } else {
+                        $("#Externalflights").append(`<tr id=${flight.flight_id}>` +
+                            "<td onclick=getColumnValue(this,0)>" + flight.flight_id + "</td>" +
+                            "<td onclick=getColumnValue(this,0)>" + flight.company_name + "</td>" +
+                            "<td onclick=getColumnValue(this,0)>" + flight.is_external + "</td>" +
+                            "<td onclick=getColumnValue(this,0)></td>" + "</tr>");
+                    }
+                });
+                // Remove from details table flights that doesn't exit anymore.
+                removeFromDetails();
+                // Remove markers that the flights doen't exist anymore.
+                removeMarkers();
+            }
             data.forEach(function (flight) {
-                // If the flight isn't external appand to "my flights" table.
-                if (flight.is_external === false) {
-                    $("#Myflights").append(`<tr id=${flight.flight_id}>` +
-                        "<td onclick = getColumnValue(this,0)>" +
-                        flight.flight_id + "</td>" + "<td onclick = getColumnValue(this,0)>" +
-                        flight.company_name + "</td>" + "<td onclick = getColumnValue(this,0)>" +
-                        flight.is_external + "</td>" + "<td><button style='font-size:10px'" +
-                        " onclick = deleterow1(this)>delete</button></td>" + "</tr>");
-                } else {
-                    $("#Externalflights").append(`<tr id=${flight.flight_id}>` +
-                        "<td onclick=getColumnValue(this,0)>" + flight.flight_id + "</td>" +
-                        "<td onclick=getColumnValue(this,0)>" + flight.company_name + "</td>" +
-                        "<td onclick=getColumnValue(this,0)>" + flight.is_external + "</td>" +
-                        "<td onclick=getColumnValue(this,0)></td>" + "</tr>");
-                }
                 // Mark this flight on Map.
                 markOnMap(flight.longitude, flight.latitude, flight.flight_id);
                 // Mark this flight in the sutable table.
-                markRow(currentMarkId);  
+                markRow(currentMarkId);
             });
-            // Remove from details table flights that doesn't exit anymore.
-            removeFromDetails();
-            // Remove markers that the flights doen't exist anymore.
-            removeMarkers();
+
         },
         // Show an error message.
         error: function (jqXHR) {
@@ -81,6 +91,29 @@ function loopFunc() {
             showErrorMessage(jqXHR.status, message);
         }
     }); 
+}
+
+// This function check if data is diffrent from flights in tables
+// Flights was added or removed.
+function isChanged(data) {
+    let rowCountMy = $('#tbodyMyFlights tr').length;
+    let rowCountExternal = $('#tbodyExternal tr').length;
+    // Data of my flights and Externel flights tables.
+    contentMyFlights = $("#Myflights").html();
+    contentExternal = $("#Externalflights").html();
+    // Check if number of flights are the same.
+    if (data.length !== rowCountMy + rowCountExternal) {
+        return 1;
+    }
+    // Go over the new data we got and ask if it isn't on tables-so it changed.
+    for (let i = 0; i < data.length; i++) {
+        if (!contentMyFlights.includes(data[i].flight_id) &&
+            !contentExternal.includes(data[i].flight_id)) {
+            return 1;
+        }
+    }
+    // Data isn't diffrent from the previous data we got.
+    return 0;
 }
 
 // This function get the current td of delete button that was selected and remove this flight.
