@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightControlWeb", "FlightControlWeb\FlightControlWeb.csproj", "{34F25ABE-65C2-4740-82B1-616194CD6060}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestFlightControlWeb", "UnitTestFlightControl\UnitTestFlightControlWeb.csproj", "{4AAEC991-A0C3-4EFB-832B-0A5C46B312A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestFlightControl", "UnitTestFlightControl\UnitTestFlightControl.csproj", "{4AAEC991-A0C3-4EFB-832B-0A5C46B312A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

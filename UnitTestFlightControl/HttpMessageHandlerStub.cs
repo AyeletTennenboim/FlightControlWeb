@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UnitTestFlightControl
+namespace UnitTestFlightControlWeb
 {
     // This class can be injected into the HttpClient which let override any request.
     public class HttpMessageHandlerStub : HttpMessageHandler

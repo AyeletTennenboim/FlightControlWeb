@@ -8,7 +8,7 @@ using FlightControlWeb.FlightObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitTestFlightControl
+namespace UnitTestFlightControlWeb
 {
     [TestClass]
     public class FlightPlanControllerTest
@@ -16,46 +16,48 @@ namespace UnitTestFlightControl
         // Instance of the tested controller.
         private FlightPlanController flightPlanController;
 
-        // Constructor.
-        public FlightPlanControllerTest()
+        [TestInitialize]
+        public void Initialize()
         {
+            // Create collections for FlightPlanController.
             IDictionary<string, FlightPlan> flightPlans =
-                new ConcurrentDictionary<string, FlightPlan>();
+            new ConcurrentDictionary<string, FlightPlan>();
             IDictionary<string, Server> flightsAndServers =
                 new ConcurrentDictionary<string, Server>();
             IList<Server> externalServers = new List<Server>();
-            HttpClient client = new HttpClient();
-            // Create clean FlightPlanController.
+            // Create external server and add it with fake flight ID to flightsAndServers list.
+            Server server = new Server()
+            {
+                ServerId = "TestServer",
+                ServerUrl = "http://www.TestServer.com/"
+            };
+            flightsAndServers.Add("AB1234", server);
+            // Inject HttpMessageHandler into a new HttpClient.
+            // It lets override the HttpClient's response method with a stub one.
+            HttpClient httpClient = new HttpClient(new HttpMessageHandlerStub());
+            // Create a new FlightPlanController with the objects created above.
             flightPlanController = new FlightPlanController(flightPlans, externalServers,
-                flightsAndServers, client);
+                flightsAndServers, httpClient);
         }
 
-        // Create and return a FlightPlan object.
-        private FlightPlan GetSampleFlightPlan()
+        [TestMethod]
+        // Test the flight plan controller's "GET" (by ID) method with external flight ID.
+        public async Task GetExternalFlightPlanByIdAsync()
         {
-            // Create FlightPlan object.
-            FlightPlan flightPlan = new FlightPlan()
-            {
-                Passengers = 200,
-                CompanyName = "EL-AL",
-                InitialLocation = new InitialLocation()
-                {
-                    Longitude = 34.95,
-                    Latitude = 29.55,
-                    DateTime = DateTime.Parse("2020-05-31T23:30:00Z")
-                },
-                Segments = new Segment[]
-                {   new Segment()
-                    {
-                        Longitude = 35.21, Latitude = 31.76, TimespanSeconds = 1000
-                    },
-                    new Segment()
-                    {
-                        Longitude = 34.78, Latitude = 32.11, TimespanSeconds = 750
-                    }
-                }
-            };
-            return flightPlan;
+            // Arrange - Create FlightPlanController with injected HttpClient stub in
+            // the Initialize() method.
+
+            // Act - Request a flight plan by flight ID received from an external server.
+            var response = await flightPlanController.GetFlightPlanById("AB1234")
+                as ActionResult<FlightPlan>;
+            var responseFlightPlan = response.Value as FlightPlan;
+
+            // Assert - Check that the returned object is the correct flight plan.
+            Assert.IsInstanceOfType(responseFlightPlan, typeof(FlightPlan));
+            Assert.AreEqual("TestAir", responseFlightPlan.CompanyName);
+            Assert.AreEqual(160, responseFlightPlan.Passengers);
+            Assert.IsNotNull(responseFlightPlan.InitialLocation);
+            Assert.IsNotNull(responseFlightPlan.Segments);
         }
 
         [TestMethod]
@@ -103,41 +105,32 @@ namespace UnitTestFlightControl
             Assert.IsInstanceOfType(badResponse, typeof(BadRequestResult));
         }
 
-        [TestMethod]
-        // Test the flight plan controller's "GET" (by ID) method with external flight ID.
-        public async Task GetExternalFlightPlanByIdAsync()
+        // Create and return a FlightPlan object.
+        private FlightPlan GetSampleFlightPlan()
         {
-            // Arrange - create collections for FlightPlanController.
-            IDictionary<string, FlightPlan> flightPlans =
-                new ConcurrentDictionary<string, FlightPlan>();
-            IDictionary<string, Server> flightsAndServers =
-                new ConcurrentDictionary<string, Server>();
-            IList<Server> externalServers = new List<Server>();
-            // Create external server and add it with fake flight ID to flightsAndServers list.
-            Server server = new Server()
+            // Create FlightPlan object.
+            FlightPlan flightPlan = new FlightPlan()
             {
-                ServerId = "TestServer",
-                ServerUrl = "http://www.TestServer.com/"
+                Passengers = 200,
+                CompanyName = "EL-AL",
+                InitialLocation = new InitialLocation()
+                {
+                    Longitude = 34.95,
+                    Latitude = 29.55,
+                    DateTime = DateTime.Parse("2020-05-31T23:30:00Z")
+                },
+                Segments = new Segment[]
+                {   new Segment()
+                    {
+                        Longitude = 35.21, Latitude = 31.76, TimespanSeconds = 1000
+                    },
+                    new Segment()
+                    {
+                        Longitude = 34.78, Latitude = 32.11, TimespanSeconds = 750
+                    }
+                }
             };
-            flightsAndServers.Add("AB1234", server);
-            // Inject HttpMessageHandler into a new HttpClient.
-            // It lets override the HttpClient's response method with a stub one.
-            HttpClient httpClient = new HttpClient(new HttpMessageHandlerStub());
-            // Create a new FlightPlanController with the objects created above.
-            flightPlanController = new FlightPlanController(flightPlans, externalServers,
-                flightsAndServers, httpClient);
-
-            // Act - Request a flight plan by flight ID received from an external server.
-            var response = await flightPlanController.GetFlightPlanById("AB1234")
-                as ActionResult<FlightPlan>;
-            var responseFlightPlan = response.Value as FlightPlan; ///////////////////////////////////////
-
-            // Assert - Check that the returned object is the correct flight plan.
-            Assert.IsInstanceOfType(responseFlightPlan, typeof(FlightPlan));
-            Assert.AreEqual("TestAir", responseFlightPlan.CompanyName);
-            Assert.AreEqual(160, responseFlightPlan.Passengers);
-            Assert.IsNotNull(responseFlightPlan.InitialLocation);
-            Assert.IsNotNull(responseFlightPlan.Segments);
+            return flightPlan;
         }
     }
 }
