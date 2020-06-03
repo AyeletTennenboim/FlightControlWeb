@@ -33,7 +33,7 @@ namespace FlightControlWeb.Controllers
                 plan = await flightsManager.GetFlightPlanById(id);
                 // 200 status code (success) - The resource has been fetched and is transmitted
                 // in the message body.
-                return Ok(plan);
+                return plan;
             }
             catch (Exception)
             {

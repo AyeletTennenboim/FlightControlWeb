@@ -4,7 +4,9 @@
 // Setting the map.
 let map = L.map('map').setView([0, 0], 1);
 L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=LjrLBX4zwd2F8ebL9DTU', {
-    attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+    attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy;' +
+        ' MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy;' +
+        ' OpenStreetMap contributors</a>'
 }).addTo(map);
 let layerGroup = L.layerGroup().addTo(map);
 let markers = new Object();
@@ -38,7 +40,6 @@ $(document).ready(function () {
 function loopFunc() {
     // The date and time now.
     let date = new Date().toISOString().substr(0, 19) + "Z";
-    console.log(date);//////////////////////////////////////////////////Delete/
     // Request to all flights in this date.
     let flightUrl = "/api/Flights?relative_to=" + date + "&sync_all";
     // Get requst to all flights in the current date.
@@ -46,21 +47,21 @@ function loopFunc() {
         url: flightUrl,
         method: 'GET',
         success: function (data) {
-            console.log(data);/////////////////////////////////////delete
-            
             // Initialize the table before add the current flights.
-            intializeTable();
-            
+            intializeTable();           
             data.forEach(function (flight) {
                 // If the flight isn't external appand to "my flights" table.
                 if (flight.is_external === false) {
-                    $("#Myflights").append(`<tr id=${flight.flight_id}><td onclick = getColumnValue(this,0)>` +
-                        flight.flight_id + "</td>" + "<td onclick = getColumnValue(this,0)>" + flight.company_name +
-                        "</td>" + "<td onclick = getColumnValue(this,0)>" + flight.is_external +
-                        "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
+                    $("#Myflights").append(`<tr id=${flight.flight_id}>` +
+                        "<td onclick = getColumnValue(this,0)>" +
+                        flight.flight_id + "</td>" + "<td onclick = getColumnValue(this,0)>" +
+                        flight.company_name + "</td>" + "<td onclick = getColumnValue(this,0)>" +
+                        flight.is_external + "</td>" + "<td><button style='font-size:10px'" +
+                        " onclick = deleterow1(this)>delete</button></td>" + "</tr>");
                 } else {
-                    $("#Externalflights").append(`<tr id=${flight.flight_id}><td onclick=getColumnValue(this,0)>` +
-                        flight.flight_id + "</td>" + "<td onclick=getColumnValue(this,0)>" + flight.company_name + "</td>" +
+                    $("#Externalflights").append(`<tr id=${flight.flight_id}>` +
+                        "<td onclick=getColumnValue(this,0)>" + flight.flight_id + "</td>" +
+                        "<td onclick=getColumnValue(this,0)>" + flight.company_name + "</td>" +
                         "<td onclick=getColumnValue(this,0)>" + flight.is_external + "</td>" +
                         "<td onclick=getColumnValue(this,0)></td>" + "</tr>");
                 }
@@ -121,6 +122,7 @@ function deleterow1(el) {
     });
 }
 
+
 /* This function get td that was selected in flights tables or id and flag
    that signs if we clicked flight from tables or from icon on map.*/
 function getColumnValue(e, flag) {
@@ -171,7 +173,8 @@ function getColumnValue(e, flag) {
                     // Remove GMT from string.
                     let initialSubString = initialTime.substring(0, initialTime.indexOf("G"));
                     // Calculate timespan from all segments.
-                    let addTime = flight.segments.map(segment => segment.timespan_seconds).reduce((a, b) => a + b, 0);
+                    let addTime = flight.segments.map(segment =>
+                        segment.timespan_seconds).reduce((a, b) => a + b, 0);
                     let dateFlight = new Date(flight.initial_location.date_time);
                     // Add timespan from all segments to initial time.
                     dateFlight.setSeconds(dateFlight.getSeconds() + addTime);
@@ -179,15 +182,23 @@ function getColumnValue(e, flag) {
                     // Remove GMT from string.
                     let arrivalSubString = arrival.substring(0, arrival.indexOf("G"));
                     // Append selected flight to details table.
-                    $("#flight-details").append(`<tr id=${text}><td>` + text + "</td><td> Longitude: " + flight.initial_location.longitude + "<br/>Latitude: " + flight.initial_location.latitude + "</td><td> Longitude: " + flight.segments[len - 1].longitude + "<br/>Latitude: " + flight.segments[len - 1].latitude + "</td><td>" + initialSubString + "</td><td>" + arrivalSubString + "</td><td>" + flight.company_name + "</td ><td>" + flight.passengers + "</td></tr > ");
+                    $("#flight-details").append(`<tr id=${text}><td>` + text +
+                        "</td><td> Longitude: " + flight.initial_location.longitude +
+                        "<br/>Latitude: " + flight.initial_location.latitude +
+                        "</td><td> Longitude: " + flight.segments[len - 1].longitude +
+                        "<br/>Latitude: " + flight.segments[len - 1].latitude + "</td><td>" +
+                        initialSubString + "</td><td>" + arrivalSubString + "</td><td>" +
+                        flight.company_name + "</td ><td>" + flight.passengers + "</td></tr > ");
                     // Initial points segments
                     latlngs = [];
                     // Insert point segment of initial point.
-                    let pointSeg = L.marker([flight.initial_location.latitude, flight.initial_location.longitude]);
+                    let pointSeg = L.marker([flight.initial_location.latitude,
+                    flight.initial_location.longitude]);
                     latlngs.push(pointSeg.getLatLng());
                     // For each segment insert it's location to lastlng array.
                     for (let i in flight.segments) {
-                        pointSeg = L.marker([flight.segments[i].latitude, flight.segments[i].longitude]);
+                        pointSeg = L.marker([flight.segments[i].latitude,
+                        flight.segments[i].longitude]);
                         latlngs.push(pointSeg.getLatLng());
                     }
                     // Remove previous polyline.
@@ -350,16 +361,19 @@ $('#add-flight-plan-button').on('click', function (e) {
         success: function () { $('#errorsWindow').text("") },
         // Show an error message.
         error: function (jqXHR) {
-            let message = "Invalid flight plan file selected. Please check your file and try again";
+            let message = "Invalid flight plan file selected. " +
+                "Please check your file and try again";
             showErrorMessage(jqXHR.status, message);
         }        
     });
 });
 
+
 // Show an error message when an action fails.
 function showErrorMessage(errorStatusCode, message) {
     if (errorStatusCode != 0) {
-        $('#errorsWindow').text("Error: " + message + "\n" + "(Status Code: " + errorStatusCode + ")");
+        $('#errorsWindow').text("Error: " + message + "\n" + "(Status Code: " +
+            errorStatusCode + ")");
     } else {
         $('#errorsWindow').text("Error: Server connection failure.\n Try reconnecting.");
     }
