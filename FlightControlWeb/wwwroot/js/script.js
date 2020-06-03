@@ -23,11 +23,10 @@ let blackIcon = new L.Icon({
     popupAnchor: [1, 1]
 });
 
-// Id of flight that was selected, -1 if no flight is selected.
-//let selectedId = -1;
 // Array of all segments of flight.
 let latlngs = Array();
 let polyline;
+// Id of flight that was selected, -1 if no flight is selected.
 let currentMarkId = -1;
 
 // Java script will only run after the page loads.
@@ -47,7 +46,7 @@ function loopFunc() {
         url: flightUrl,
         method: 'GET',
         success: function (data) {
-            console.log(data);
+            console.log(data);/////////////////////////////////////delete
             
             // Initialize the table before add the current flights.
             intializeTable();
@@ -59,17 +58,13 @@ function loopFunc() {
                         flight.flight_id + "</td>" + "<td onclick = getColumnValue(this,0)>" + flight.company_name +
                         "</td>" + "<td onclick = getColumnValue(this,0)>" + flight.is_external +
                         "</td>" + "<td><button style='font-size:10px' onclick = deleterow1(this)>delete</button></td>" + "</tr>");
-                    // Mark this flight on Map.
-                    //markOnMap(flight.longitude, flight.latitude, flight.flight_id);////////////////////
-                 // If the flight is external appand to "External flights" table.
                 } else {
                     $("#Externalflights").append(`<tr id=${flight.flight_id}><td onclick=getColumnValue(this,0)>` +
                         flight.flight_id + "</td>" + "<td onclick=getColumnValue(this,0)>" + flight.company_name + "</td>" +
                         "<td onclick=getColumnValue(this,0)>" + flight.is_external + "</td>" +
                         "<td onclick=getColumnValue(this,0)></td>" + "</tr>");
-                    // Mark this flight on Map.
-                    //markOnMap(flight.longitude, flight.latitude, flight.flight_id);/////////////////////
                 }
+                // Mark this flight on Map.
                 markOnMap(flight.longitude, flight.latitude, flight.flight_id);
                 // Mark this flight in the sutable table.
                 markRow(currentMarkId);  
@@ -90,8 +85,7 @@ function loopFunc() {
 // This function get the current td of delete button that was selected and remove this flight.
 function deleterow1(el) {
     // Get the row of the td that was clicked.
-    let row = $(el).closest('tr');
-    
+    let row = $(el).closest('tr');    
     // Get flight Id.
     let firstTd = row.find("td:first")[0].innerText;
     // Delete request.
@@ -113,8 +107,6 @@ function deleterow1(el) {
             if (firstTd === currentMarkId) {
                 // Delete polyline only if the deleted row is selected.
                 removePolyline();
-               
-                //delete markers[firstTd];
                 // If the current marked flight is the flight which deleted - flag -1
                 // There is no flight that is selected.
                 currentMarkId = -1;
@@ -143,38 +135,30 @@ function getColumnValue(e, flag) {
         // Get the row of the selected td.
         let row = $(e).closest('tr');
         // Get flight id from table.
-        text = row.find("td:first")[0].innerText;
-        
-    }
-
-    
+        text = row.find("td:first")[0].innerText;      
+    }   
     // Get flight plan if this current flight that was selected.
     let flightplan = "/api/FlightPlan/" + text;
     $.ajax({
         url: flightplan,
         method: 'GET',
         success: function (flight) {
+            // Mark this row by id we got.
+            markRow(text);
             // Clean row that is marked before.
             cleanMarksRows();
             // Remove previous polyline.
             if (currentMarkId != text) {
                 removePolyline();
             }
-            
+            // Return the black icon to the previous mark.
             if (currentMarkId != -1) {
                 markers[currentMarkId].setIcon(blackIcon);
-            }
-            markRow(text);
+            }           
             // Mark current flight that was selected with "clicked icon".
             markers[text].setIcon(clickedIcon);
-            // Clean row that is marked before.
-            //cleanMarksRows();
             // Update current flight Id that is marked.
             currentMarkId = text;
-            // Update flight id which selected.
-            //selectedId = text;
-            // Mark row of this selected flight in table.
-            //markRow(selectedId);
             // Delete the previous error message.
             $('#errorsWindow').text("");
             let len = flight.segments.length;
@@ -241,12 +225,12 @@ function deleteRowDetails(flightId) {
 
 // Remove from details table if flight isn't in tables anymore.
 function removeFromDetails() {
-
     let tableMyFlight = document.getElementById("Myflights");
     let tableExternalFlight = document.getElementById("Externalflights");
     if ((!tableMyFlight.rows[currentMarkId]) && (!tableExternalFlight.rows[currentMarkId])) {
         deleteRowDetails(currentMarkId);
         removePolyline();
+        // Update that there are no flights marked.
         currentMarkId = -1;
     }
 }
@@ -294,13 +278,13 @@ function markOnMap(longitude, latitude, id) {
 // Function click on when click on map.
 map.on("click", function () {
     if (currentMarkId != -1) {
-        // set current marker on map to black "not selected".
+        // Set current marker on map to black "not selected".
         markers[currentMarkId].setIcon(blackIcon);
-        // delete row details.
+        // Delete row details.
         deleteRowDetails(currentMarkId);
-        // clean mark rows in table.
+        // Clean mark rows in table.
         cleanMarksRows();
-        //remove polyline.
+        // Remove polyline.
         removePolyline();
         // Update that no id was selected.
         currentMarkId = -1;
@@ -313,14 +297,13 @@ function markRow(id) {
     let tableMyFlight = document.getElementById("Myflights");
     let tableExternalFlight = document.getElementById("Externalflights");
     // Clean row that is marked before.
-    //cleanMarksRows();
     // If the id that we want to mark is on my flights table- set the suitable row to red.
     if (tableMyFlight.rows[id]) {
         rows = tableMyFlight.getElementsByTagName('tr');
         rows[id].style.backgroundColor = "red";
     }
     // If the id that we want to mark is on external flights table- set the suitable row to red.
-    if (tableExternalFlight.rows[id]) {
+    else if (tableExternalFlight.rows[id]) {
         rows = tableExternalFlight.getElementsByTagName('tr');
         rows[id].style.backgroundColor = "red";
     }
