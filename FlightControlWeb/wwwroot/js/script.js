@@ -144,8 +144,7 @@ function deleterow1(el) {
                 // If the current marked flight is the flight which deleted - flag -1
                 // There is no flight that is selected.
                 currentMarkId = -1;
-            }
-            
+            }           
         },
          // Show an error message.
         error: function (jqXHR) {
@@ -154,7 +153,6 @@ function deleterow1(el) {
         }
     });
 }
-
 
 /* This function get td that was selected in flights tables or id and flag
    that signs if we clicked flight from tables or from icon on map.*/
@@ -247,8 +245,7 @@ function getColumnValue(e, flag) {
                 showErrorMessage(jqXHR.status, message);
             }
         });  
-    }
-    
+    }   
 }
 
 // Remove all data in flights tables exept the first row of the head.
@@ -263,8 +260,7 @@ function deleteRowDetails(flightId) {
     // Delete flight id that we got from details table if exist.
     if (table.rows[flightId]) {
         let rowIndex = document.getElementById(flightId).rowIndex;
-        table.deleteRow(rowIndex);
-        
+        table.deleteRow(rowIndex);        
     }
 }
 
@@ -333,8 +329,7 @@ map.on("click", function () {
         removePolyline();
         // Update that no id was selected.
         currentMarkId = -1;
-    }
-    
+    }   
 });
 
 // This function get flight id and mark row in the suitable table.
@@ -400,7 +395,6 @@ $('#add-flight-plan-button').on('click', function (e) {
         }        
     });
 });
-
 
 // Show an error message when an action fails.
 function showErrorMessage(errorStatusCode, message) {
